@@ -86,6 +86,15 @@ export function Login() {
     )}&state=xyz&nonce=abc`;
   };
 
+  
+const jauthLogin = () => {
+    const CLIENT_ID = "49965bd5a5d6b7a9a7dcba1ad66c9979adfc1a8fcf8b85cf30f3ae3695591712";
+    const REDIRECT_URI = `${window.location.origin}/auth/jauth/callback`;
+    const SCOPE = "profile email";
+    
+    window.location.href = `https://jauth.jagadesh31.tech/oauth/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPE)}`;
+};
+
   if (user) return <Navigate to={from} replace />;
 
   return (
@@ -156,6 +165,10 @@ export function Login() {
         </div>
 
         <div className="flex gap-6">
+          <SiDash
+            className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
+            onClick={jauthLogin}
+          />
           <FaGoogle
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={googleLogin}

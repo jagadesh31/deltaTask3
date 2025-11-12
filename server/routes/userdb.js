@@ -1,7 +1,7 @@
 let express = require('express');
 const multer = require('multer');
 
-let {registerUser,loginUser,updatePassword,autoLoginUser,updateUser,changePassword,findUser,uploadImage,deleteUser,googleLogin,dauthLogin} = require('../controllers/auth.js');
+let {registerUser,loginUser,updatePassword,autoLoginUser,updateUser,changePassword,findUser,uploadImage,deleteUser,googleLogin,dauthLogin, jauthLogin} = require('../controllers/auth.js');
 
 let dbRoutes = express.Router();
 
@@ -20,5 +20,6 @@ dbRoutes.post('/uploadImage', upload.single('image'),uploadImage)
 dbRoutes.delete('/delete',deleteUser);
 dbRoutes.get('/google/callback', googleLogin)
 dbRoutes.get('/dauth/callback', dauthLogin)
+dbRoutes.get('/jauth/callback', jauthLogin)
 
 module.exports=dbRoutes;
