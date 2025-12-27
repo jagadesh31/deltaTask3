@@ -90,10 +90,10 @@ export function Login() {
 const jauthLogin = () => {
     const CLIENT_ID = import.meta.env.VITE_JAUTH_CLIENT_ID;
     const REDIRECT_URI = `${BASE_URL}/auth/jauth/callback`;
+    const ORIGIN_URI = import.meta.env.VITE_CLIENT_BASE_URL;
     const SCOPE = "profile email";
-    console.log(`${import.meta.env.VITE_JAUTH_BASE_URL}/oauth/authorize`);
     
-    window.location.href = `${import.meta.env.VITE_JAUTH_BASE_URL}/oauth/authorize?response_type=code&scope=${SCOPE}&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPE)}`;
+    window.location.href = `${import.meta.env.VITE_JAUTH_BASE_URL}/oauth/authorize?response_type=code&scope=${SCOPE}&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&origin_uri=${encodeURIComponent(ORIGIN_URI)}`;
 };
 
   if (user) return <Navigate to={from} replace />;
@@ -170,14 +170,14 @@ const jauthLogin = () => {
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={jauthLogin}
           />
-          <FaGoogle
+          {/* <FaGoogle
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={googleLogin}
           />
           <SiDash
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={dauthLogin}
-          />
+          /> */}
         </div>
 
         <p className="text-gray-400 text-sm">
