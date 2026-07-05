@@ -12,26 +12,30 @@
 
   export const dataContext = createContext()
 
-  let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+  let BASE_URL = import.meta.env.VITE_AUTH_URL
   
   export function AdminHome () {
     let { user, setUser } = useContext(authContext)
-    let options = ['clients', 'vendors']
-    let [currentOption, setCurrentOption] = useState('clients')
-    let [data, setData] = useState([])
+    let options = ['CLIENT', 'EXHIBITOR', 'DISTRIBUTOR']
+    let [currentOption, setCurrentOption] = useState('CLIENT')
+    let [allUsers, setAllUsers] = useState(null)
     let [loading, setLoading] = useState(true)
+    let [modalConfig, setModalConfig] = useState({ isOpen: false })
     const location = useLocation()
 
 
     const fetchData = ()=>{
       setLoading(true)
         axios
-          .get(`${BASE_URL}/auth/find?role=${currentOption.slice(0,currentOption.length-1)}`)
+          .get(`${BASE_URL}/auth/find?role=all`)
           .then(res => {
-            setData(res.data.users.reverse())
-            setTimeout(()=>setLoading(false),2000)
+            setAllUsers(res.data.users.reverse())
+            setLoading(false)
           })
-          .catch(err => {})
+          .catch(err => {
+            setAllUsers([]);
+            setLoading(false);
+          })
     }
 
     const suspendUser = (id,data) =>{
@@ -59,7 +63,9 @@
   
     useEffect(() => {
       fetchData()
-    }, [currentOption])
+    }, [])
+  
+    const displayData = allUsers ? allUsers.filter(u => u.role?.toLowerCase() === currentOption.toLowerCase()) : [];
   
     return (
       <div className='backgroundDiv min-h-screen'>
@@ -77,7 +83,7 @@
                       setCurrentOption(option)
                     }}
                   >
-                    {option.charAt(0).toUpperCase() + option.slice(1)}
+                    {option === 'CLIENT' ? 'Clients' : option === 'EXHIBITOR' ? 'Exhibitors' : 'Distributors'}
                   </span>
                 )
               })}
@@ -89,34 +95,59 @@
           <div className='main w-full py-4'>
 
           <div className="moviesList gap-4 flex flex-col">
-           {data.map((user,idx)=>{
-            return <Cards key={idx} show={user} suspendUser={suspendUser} deleteUser={deleteUser}/>
+           {displayData.length === 0 ? <div className="text-center text-gray-400 py-10 text-xl font-bold">No users found</div> : displayData.map((user,idx)=>{
+            return <Cards key={idx} show={user} suspendUser={suspendUser} deleteUser={deleteUser} setModalConfig={setModalConfig} />
            })}
            </div>
 
           </div>)}
 
+        {modalConfig.isOpen && (
+          <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80'>
+            <div className='w-full max-w-sm bg-black border border-gray-700 rounded-2xl shadow-2xl p-6 flex flex-col gap-4'>
+              <h2 className='text-xl font-bold text-white'>{modalConfig.title}</h2>
+              <p className='text-gray-300'>{modalConfig.message}</p>
+              <div className='flex justify-end gap-4 mt-4'>
+                <button className='px-4 py-2 rounded-full text-gray-300 hover:text-white transition' onClick={() => setModalConfig({isOpen: false})}>Cancel</button>
+                <button className='px-6 py-2 rounded-full font-semibold text-white bg-[#4242FA] hover:bg-blue-600 transition' onClick={modalConfig.onConfirm}>Confirm</button>
+              </div>
+            </div>
+          </div>
+        )}
         </div>
       </div>
     )
   }
 
   
-   const Cards = ({show,suspendUser,deleteUser}) =>{
+   const Cards = ({show,suspendUser,deleteUser,setModalConfig}) =>{
     console.log(show)
 
     return(
-      <div className={`trainContainer border-2 border-[#eee] ${show.isSuspended?'opacity-40':''} rounded-md p-2 px-4`}>
+      <div className={`userContainer bg-black border border-gray-700 ${show.isSuspended?'opacity-40':''} rounded-xl p-4 shadow-lg hover:border-[#4242FA] transition-all`}>
 
-         <div className="trainInfo flex items-center justify-between gap-2 md:gap-4">
-          <div className="movieInfo flex flex-col items-stretch gap-2 md:gap-4 w-full">
+         <div className="userInfo flex items-center justify-between gap-2 md:gap-4">
+          <div className="flex flex-col items-stretch gap-2 md:gap-4 w-full">
 
           <div className="header w-full flex justify-between items-center gap-3 pt-1">
-          <span className="movieId text-[#757575]">userID : {show._id}</span>
+          <span className="userId text-gray-400 text-sm font-medium">userID: {show._id}</span>
           <span className="options flex self-end gap-6">
-           <GiKnifeThrust className={`font-semibold md:text-3xl ${show.isSuspended?'text-fuchsia-600':'text-green-400'}`} onClick={()=>{
-            if(confirm(show.isSuspended?'Remove Suspension':'Suspend Account')){suspendUser(show._id,!show.isSuspended)}}}></GiKnifeThrust> 
-            <MdDeleteOutline className='text-red-600 font-semibold md:text-2xl ' onClick={()=>{if(confirm('delete')){deleteUser(show._id)}}}></MdDeleteOutline>
+           <GiKnifeThrust className={`font-semibold md:text-2xl ${show.isSuspended?'text-gray-500':'text-[#4242FA]'} cursor-pointer hover:opacity-80 transition`} onClick={()=>{
+             setModalConfig({
+               isOpen: true,
+               title: show.isSuspended ? 'Remove Suspension' : 'Suspend Account',
+               message: `Are you sure you want to ${show.isSuspended ? 'remove suspension from' : 'suspend'} ${show.username}?`,
+               onConfirm: () => { suspendUser(show._id, !show.isSuspended); setModalConfig({isOpen: false}) }
+             })
+           }}></GiKnifeThrust> 
+            <MdDeleteOutline className='text-red-400 hover:text-red-500 cursor-pointer font-semibold md:text-2xl transition' onClick={()=>{
+              setModalConfig({
+                isOpen: true,
+                title: 'Delete Account',
+                message: `Are you sure you want to delete ${show.username}? This action cannot be undone.`,
+                onConfirm: () => { deleteUser(show._id); setModalConfig({isOpen: false}) }
+              })
+            }}></MdDeleteOutline>
           </span>
         </div>
 

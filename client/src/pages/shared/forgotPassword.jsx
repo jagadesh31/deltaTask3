@@ -6,7 +6,8 @@ import { authContext } from '../../contexts/authContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL;
+let AUTH_URL = import.meta.env.VITE_AUTH_URL;
+let EMAIL_URL = import.meta.env.VITE_EMAIL_URL;
 
 export function ForgotPassword() {
   let { user } = useContext(authContext);
@@ -17,7 +18,7 @@ export function ForgotPassword() {
   const handleReset = (event) => {
     event?.preventDefault();
     axios
-      .get(`${BASE_URL}/otp/create?email=${email}`)
+      .get(`${EMAIL_URL}/otp/create?email=${email}`)
       .then(res => {
         if (res.data.message === 'success') {
           setOtpOverlay(true);
@@ -29,10 +30,10 @@ export function ForgotPassword() {
   };
 
   return (
-    <div className="w-screen min-h-screen bg-black flex justify-center items-center p-4 relative">
+    <div className="backgroundDiv w-screen min-h-screen text-white flex justify-center items-center p-4 relative">
       <ToastContainer />
       
-      <div className="w-full max-w-md bg-[#12101D] rounded-xl p-6 flex flex-col gap-6 shadow-lg">
+      <div className="w-full max-w-md bg-black border-2 border-gray-700 rounded-xl p-6 flex flex-col gap-6 shadow-lg">
         <h2 className="text-2xl font-bold text-white text-center">Forgot Password</h2>
         <p className="text-center text-gray-300">Enter your registered email to receive OTP</p>
 
@@ -77,7 +78,7 @@ const OTPOverlay = ({ email, setOtpOverlay, handleReset }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     axios
-      .get(`${BASE_URL}/otp/verify?email=${email}&otp=${otp}`)
+      .get(`${EMAIL_URL}/otp/verify?email=${email}&otp=${otp}`)
       .then(res => {
         if (res.data.message === 'OTP valid') {
           navigate(`/resetPassword/${email}`, { replace: true });
@@ -147,7 +148,7 @@ export function ResetPassword() {
   const handleSubmit = (event) => {
     event.preventDefault();
     axios
-      .put(`${BASE_URL}/auth/updatePassword?email=${email}`, { password })
+      .put(`${AUTH_URL}/auth/updatePassword?email=${email}`, { password })
       .then(res => {
         toast.success(res.data.message);
         navigate('/login', { replace: true });
@@ -156,7 +157,7 @@ export function ResetPassword() {
   };
 
   return (
-    <div className="w-screen min-h-screen bg-black flex justify-center items-center p-4">
+    <div className="backgroundDiv w-screen min-h-screen text-white flex justify-center items-center p-4">
       <div className="w-full max-w-md bg-[#12101D] rounded-xl p-6 flex flex-col gap-6 shadow-lg">
         <h2 className="text-2xl font-bold text-white text-center">Reset Password</h2>
         <form className="flex flex-col gap-4">

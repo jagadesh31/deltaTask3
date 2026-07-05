@@ -1,0 +1,631 @@
+{
+  "movies": [
+    {
+      "type": "Movie",
+      "title": "Vikram",
+      "duration": "175 min",
+      "genre": [
+        "Action",
+        "Thriller"
+      ],
+      "director": [
+        "Lokesh Kanagaraj"
+      ],
+      "writer": [
+        "Lokesh Kanagaraj"
+      ],
+      "actors": [
+        "Kamal Haasan",
+        "Vijay Sethupathi",
+        "Fahadh Faasil",
+        "Suriya"
+      ],
+      "plot": "A special investigator discovers a case of serial killings is not what it seems to be, and leading down this path is only going to end in a war between everyone involved.",
+      "language": [
+        "Tamil",
+        "Telugu",
+        "Hindi"
+      ],
+      "country": "India",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749654191/rolex_aiz3sp.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Venom",
+      "duration": "112 min",
+      "genre": [
+        "Action",
+        "Sci-Fi"
+      ],
+      "director": [
+        "Ruben Fleischer"
+      ],
+      "writer": [
+        "Jeff Pinkner",
+        "Scott Rosenberg"
+      ],
+      "actors": [
+        "Tom Hardy",
+        "Michelle Williams",
+        "Riz Ahmed"
+      ],
+      "plot": "A failed reporter is bonded to an alien entity, one of many symbiotes who have invaded Earth. But the being takes a liking to Earth and decides to protect it.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653821/venom_nhsmfr.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Kalki 2898 AD",
+      "duration": "180 min",
+      "genre": [
+        "Action",
+        "Sci-Fi",
+        "Fantasy"
+      ],
+      "director": [
+        "Nag Ashwin"
+      ],
+      "writer": [
+        "Nag Ashwin"
+      ],
+      "actors": [
+        "Prabhas",
+        "Amitabh Bachchan",
+        "Kamal Haasan",
+        "Deepika Padukone"
+      ],
+      "plot": "A modern-day avatar of Vishnu, a Hindu god, who is believed to have descended to earth to protect the world from evil forces.",
+      "language": [
+        "Telugu",
+        "Hindi",
+        "Tamil"
+      ],
+      "country": "India",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653449/kalki_rhnf7e.webp"
+    },
+    {
+      "type": "Movie",
+      "title": "Godzilla x Kong: The New Empire",
+      "duration": "115 min",
+      "genre": [
+        "Action",
+        "Adventure",
+        "Sci-Fi"
+      ],
+      "director": [
+        "Adam Wingard"
+      ],
+      "writer": [
+        "Terry Rossio"
+      ],
+      "actors": [
+        "Rebecca Hall",
+        "Brian Tyree Henry",
+        "Dan Stevens"
+      ],
+      "plot": "Two ancient titans, Godzilla and Kong, clash in an epic battle as humans unravel their intertwined origins and connection to Skull Island's mysteries.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653447/godzilla_xyszfj.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Kaithi 2",
+      "duration": "150 min",
+      "genre": [
+        "Action",
+        "Thriller"
+      ],
+      "director": [
+        "Lokesh Kanagaraj"
+      ],
+      "writer": [
+        "Lokesh Kanagaraj"
+      ],
+      "actors": [
+        "Karthi"
+      ],
+      "plot": "The continuation of Dilli's journey as he navigates the dangerous underworld while trying to protect his daughter.",
+      "language": [
+        "Tamil"
+      ],
+      "country": "India",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653444/kaithi2_ffrqsn.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Mission: Impossible - Dead Reckoning Part One",
+      "duration": "163 min",
+      "genre": [
+        "Action",
+        "Adventure",
+        "Thriller"
+      ],
+      "director": [
+        "Christopher McQuarrie"
+      ],
+      "writer": [
+        "Christopher McQuarrie",
+        "Erik Jendresen"
+      ],
+      "actors": [
+        "Tom Cruise",
+        "Hayley Atwell",
+        "Ving Rhames"
+      ],
+      "plot": "Ethan Hunt and his IMF team must track down a dangerous weapon before it falls into the wrong hands.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653443/missionIpossible_s9lz5h.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Salaar: Part 1 - Ceasefire",
+      "duration": "175 min",
+      "genre": [
+        "Action",
+        "Thriller",
+        "Drama"
+      ],
+      "director": [
+        "Prashanth Neel"
+      ],
+      "writer": [
+        "Prashanth Neel"
+      ],
+      "actors": [
+        "Prabhas",
+        "Prithviraj Sukumaran",
+        "Shruti Haasan"
+      ],
+      "plot": "A gang leader makes a promise to a dying friend to take on the other criminal gangs.",
+      "language": [
+        "Telugu",
+        "Hindi",
+        "Tamil"
+      ],
+      "country": "India",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653442/salaar_hbklxu.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Wolf Man",
+      "duration": "120 min",
+      "genre": [
+        "Horror",
+        "Thriller"
+      ],
+      "director": [
+        "Leigh Whannell"
+      ],
+      "writer": [
+        "Leigh Whannell",
+        "Corbett Tuck"
+      ],
+      "actors": [
+        "Christopher Abbott",
+        "Julia Garner"
+      ],
+      "plot": "A man seeks to protect his family from a dangerous predator.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653010/wolfman_s33zir.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Evil Dead Rise",
+      "duration": "96 min",
+      "genre": [
+        "Horror"
+      ],
+      "director": [
+        "Lee Cronin"
+      ],
+      "writer": [
+        "Lee Cronin"
+      ],
+      "actors": [
+        "Mirabai Pease",
+        "Richard Crouchley",
+        "Anna-Maree Thomas"
+      ],
+      "plot": "A twisted tale of two estranged sisters whose reunion is cut short by the rise of flesh-possessing demons, thrusting them into a primal battle for survival.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653010/EvilDeadRise_xopc9x.webp"
+    },
+    {
+      "type": "Movie",
+      "title": "Avengers: Doomsday",
+      "duration": "160 min",
+      "genre": [
+        "Action",
+        "Adventure",
+        "Sci-Fi"
+      ],
+      "director": [
+        "Anthony Russo",
+        "Joe Russo"
+      ],
+      "writer": [
+        "Stephen McFeely"
+      ],
+      "actors": [
+        "Robert Downey Jr.",
+        "Pedro Pascal",
+        "Vanessa Kirby"
+      ],
+      "plot": "The Avengers face their most formidable foe yet, Doctor Doom, in a battle for the fate of the multiverse.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749653009/AvengersDoomsDay_graueq.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Leo",
+      "duration": "164 min",
+      "genre": [
+        "Action",
+        "Crime",
+        "Drama"
+      ],
+      "director": [
+        "Lokesh Kanagaraj"
+      ],
+      "writer": [
+        "Lokesh Kanagaraj",
+        "Rathna Kumar",
+        "Dheeraj Vaidy"
+      ],
+      "actors": [
+        "Vijay",
+        "Sanjay Dutt",
+        "Arjun Sarja"
+      ],
+      "plot": "A mild-mannered cafe owner becomes a local hero, but his actions attract the attention of a dangerous drug cartel who believe he was once part of them.",
+      "language": [
+        "Tamil",
+        "Telugu",
+        "Hindi"
+      ],
+      "country": "India",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749650954/leo_lupue4.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Final Destination: Bloodlines",
+      "duration": "105 min",
+      "genre": [
+        "Horror",
+        "Thriller"
+      ],
+      "director": [
+        "Zach Lipovsky",
+        "Adam B. Stein"
+      ],
+      "writer": [
+        "Guy Busick",
+        "Lori Evans Taylor"
+      ],
+      "actors": [
+        "Brec Bassinger",
+        "Teo Briones"
+      ],
+      "plot": "Death returns to claim those who survived a tragic event, focusing on the bloodline of previous survivors.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749650817/finalDestination_umqrgj.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "HIT: The Third Case",
+      "duration": "140 min",
+      "genre": [
+        "Action",
+        "Thriller"
+      ],
+      "director": [
+        "Sailesh Kolanu"
+      ],
+      "writer": [
+        "Sailesh Kolanu"
+      ],
+      "actors": [
+        "Nani",
+        "Srinidhi Shetty"
+      ],
+      "plot": "A badass cop named Arjun Sarkar navigates a complex and gruesome murder investigation in the third installment of the HIT universe.",
+      "language": [
+        "Telugu",
+        "Hindi"
+      ],
+      "country": "India",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749648286/hit3_zltzz7.webp"
+    },
+    {
+      "type": "Movie",
+      "title": "Kingdom of the Planet of the Apes",
+      "duration": "145 min",
+      "genre": [
+        "Action",
+        "Adventure",
+        "Sci-Fi"
+      ],
+      "director": [
+        "Wes Ball"
+      ],
+      "writer": [
+        "Josh Friedman"
+      ],
+      "actors": [
+        "Owen Teague",
+        "Freya Allan",
+        "Kevin Durand"
+      ],
+      "plot": "Many years after the reign of Caesar, a young ape goes on a journey that will lead him to question everything he's been taught about the past.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749647576/KingdomOfThePlanetOfTheApes_hqr6ja.jpg"
+    },
+    {
+      "type": "Movie",
+      "title": "Avengers: Endgame",
+      "duration": "181 min",
+      "genre": [
+        "Action",
+        "Adventure",
+        "Sci-Fi"
+      ],
+      "director": [
+        "Anthony Russo",
+        "Joe Russo"
+      ],
+      "writer": [
+        "Christopher Markus",
+        "Stephen McFeely"
+      ],
+      "actors": [
+        "Robert Downey Jr.",
+        "Chris Evans",
+        "Mark Ruffalo"
+      ],
+      "plot": "After the devastating events of Infinity War, the Avengers assemble once more in order to reverse Thanos' actions and restore balance to the universe.",
+      "language": [
+        "English"
+      ],
+      "country": "USA",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1749646815/AvengersEndGame_o9ptoc.jpg"
+    }
+  ],
+  "concerts": [
+    {
+      "type": "Concert",
+      "title": "The Chromatica Ball",
+      "duration": "120 min",
+      "genre": [
+        "Pop",
+        "Dance"
+      ],
+      "Artist": "Lady Gaga",
+      "plot": "Lady Gaga's visually stunning and musically explosive summer stadium tour supporting her chart-topping album Chromatica.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1751036463/The_Chromatica_Ball_tmbkh9.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "Happier Than Ever, The World Tour",
+      "duration": "110 min",
+      "genre": [
+        "Pop",
+        "Alternative"
+      ],
+      "Artist": "Billie Eilish",
+      "plot": "Billie Eilish embarks on her massive world tour featuring songs from her hit sophomore album Happier Than Ever.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1751036457/Happier_Than_Ever_Tour_ml6ooc.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "Got Back Tour",
+      "duration": "160 min",
+      "genre": [
+        "Rock",
+        "Pop"
+      ],
+      "Artist": "Paul McCartney",
+      "plot": "Legendary musician Paul McCartney performs historic sets featuring decades of iconic Beatles, Wings, and solo hits.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1751036456/Got_Back_Tour_rjmvlk.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "WalkerWorld Tour",
+      "duration": "100 min",
+      "genre": [
+        "EDM",
+        "Electronic"
+      ],
+      "Artist": "Alan Walker",
+      "plot": "Alan Walker brings his immersive WalkerWorld experience to life with spectacular visuals and electrifying beats.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1751036455/Alan_Walker_World_Tour_fmcyxc.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "Justice World Tour",
+      "duration": "120 min",
+      "genre": [
+        "Pop",
+        "R&B"
+      ],
+      "Artist": "Justin Bieber",
+      "plot": "Justin Bieber's global trek in support of his highly acclaimed album Justice, featuring chart-topping anthems.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1751036455/Justice_World_Tour_skf4bv.webp"
+    },
+    {
+      "type": "Concert",
+      "title": "The Big Steppers Tour",
+      "duration": "130 min",
+      "genre": [
+        "Hip Hop",
+        "Rap"
+      ],
+      "Artist": "Kendrick Lamar",
+      "plot": "Kendrick Lamar's theatrical and deeply artistic world tour, critically hailed as one of the greatest rap tours ever.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1751036455/The_Big_Steppers_Tour_d4v81c.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "Future Nostalgia Tour",
+      "duration": "105 min",
+      "genre": [
+        "Pop",
+        "Disco"
+      ],
+      "Artist": "Dua Lipa",
+      "plot": "Dua Lipa brings the ultimate dance party with her Future Nostalgia Tour, filled with neon lights and infectious energy.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1751036455/Future_Nostalgia_Tour_sta2uk.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "Renaissance World Tour",
+      "duration": "150 min",
+      "genre": [
+        "R&B",
+        "Pop",
+        "Dance"
+      ],
+      "Artist": "Beyoncé",
+      "plot": "Beyoncé's record-breaking stadium tour celebrating club culture, self-expression, and the critically acclaimed Renaissance album.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1750006033/renaissance_world_tour_qqwx2w.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "The Eras Tour",
+      "duration": "200 min",
+      "genre": [
+        "Pop",
+        "Country",
+        "Alternative"
+      ],
+      "Artist": "Taylor Swift",
+      "plot": "A journey through all of Taylor Swift's musical eras, featuring stunning sets, multiple outfit changes, and a career-spanning setlist.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1750006033/the_eras_tour_vlykyf.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "After Hours til Dawn Tour",
+      "duration": "115 min",
+      "genre": [
+        "R&B",
+        "Pop",
+        "Electronic"
+      ],
+      "Artist": "The Weeknd",
+      "plot": "The Weeknd's massive, conceptual stadium tour combining the dark synths of After Hours and the upbeat energy of Dawn FM.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1750006033/After_Hours_til_Dawn_wbyi9d.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "Love On Tour",
+      "duration": "110 min",
+      "genre": [
+        "Pop",
+        "Rock"
+      ],
+      "Artist": "Harry Styles",
+      "plot": "Harry Styles brings joy, dancing, and his signature charm to sold-out arenas globally in this vibrant celebration of music and love.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1750006032/love_on_tour_dha8rf.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "It's All A Blur Tour",
+      "duration": "120 min",
+      "genre": [
+        "Hip Hop",
+        "Rap",
+        "R&B"
+      ],
+      "Artist": "Drake",
+      "plot": "Drake returns to the stage celebrating the last decade of his unprecedented run with an immersive, hit-packed spectacle.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1750006032/It_s_All_A_Blur_ctdoy2.jpg"
+    },
+    {
+      "type": "Concert",
+      "title": "Music of the Spheres World Tour",
+      "duration": "135 min",
+      "genre": [
+        "Rock",
+        "Pop"
+      ],
+      "Artist": "Coldplay",
+      "plot": "Coldplay's eco-friendly, colorful, and euphoric stadium tour featuring dazzling light shows and stadium-sized anthems.",
+      "language": [
+        "English"
+      ],
+      "country": "Global",
+      "poster": "https://res.cloudinary.com/diizmtj04/image/upload/v1750006032/music_of_the_spheres_gupo8k.jpg"
+    }
+  ]
+}

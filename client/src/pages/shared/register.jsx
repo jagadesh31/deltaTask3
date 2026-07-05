@@ -10,8 +10,25 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authContext } from "../../contexts/authContext";
 
-let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL;
+let BASE_URL = import.meta.env.VITE_AUTH_URL;
 
+const googleLogin = () => {
+  const CLIENT_ID = "486170631932-5s4abs9lgv958ptc06ho5705r50i2ccb.apps.googleusercontent.com";
+  const REDIRECT_URI = `${BASE_URL}/auth/google/callback`;
+  const SCOPE = "openid email profile";
+  window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${encodeURIComponent(
+    SCOPE
+  )}`;
+};
+
+const jauthLogin = () => {
+  const CLIENT_ID = import.meta.env.VITE_JAUTH_CLIENT_ID;
+  const REDIRECT_URI = `${BASE_URL}/auth/jauth/callback`;
+  const ORIGIN_URI = import.meta.env.VITE_CLIENT_BASE_URL;
+  const SCOPE = "profile email";
+  
+  window.location.href = `${import.meta.env.VITE_JAUTH_BASE_URL}/oauth/authorize?response_type=code&scope=${SCOPE}&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&origin_uri=${encodeURIComponent(ORIGIN_URI)}`;
+};
 function Loader() {
   return (
     <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-6 w-6"></div>
@@ -21,8 +38,8 @@ function Loader() {
 export function Login() {
   const { user, setUser } = useContext(authContext);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ role: "client", email: "", password: "" });
-  const roles = ["admin", "client", "vendor"];
+  const [formData, setFormData] = useState({ role: "CLIENT", email: "", password: "" });
+  const roles = ["ADMIN", "CLIENT", "DISTRIBUTOR", "EXHIBITOR"];
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || "/";
@@ -51,14 +68,7 @@ export function Login() {
           }
           setUser(res.data.user);
           localStorage.setItem("token", res.data.token);
-          navigate(
-            res.data.user.role === "admin"
-              ? "/admin"
-              : res.data.user.role === "vendor"
-              ? "/vendor"
-              : from,
-            { replace: true }
-          );
+          navigate(from === "/" ? "/home" : from, { replace: true });
         }
       })
       .catch((err) => {
@@ -67,48 +77,20 @@ export function Login() {
       });
   };
 
-  const googleLogin = () => {
-    const CLIENT_ID = "486170631932-5s4abs9lgv958ptc06ho5705r50i2ccb.apps.googleusercontent.com";
-    const REDIRECT_URI = `${BASE_URL}/auth/google/callback`;
-    const SCOPE = "openid email profile";
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${encodeURIComponent(
-      SCOPE
-    )}`;
-  };
-
-  const dauthLogin = () => {
-    const CLIENT_ID = "lAOrfPy9uph9nGYe";
-    const REDIRECT_URI = `${BASE_URL}/auth/dauth/callback`;
-        console.log(`${BASE_URL}/auth/google/callback`)
-    const SCOPE = "email+user+profile+openid";
-    window.location.href = `https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(
-      SCOPE
-    )}&state=xyz&nonce=abc`;
-  };
-
-
-const jauthLogin = () => {
-    const CLIENT_ID = import.meta.env.VITE_JAUTH_CLIENT_ID;
-    const REDIRECT_URI = `${BASE_URL}/auth/jauth/callback`;
-    const ORIGIN_URI = import.meta.env.VITE_CLIENT_BASE_URL;
-    const SCOPE = "profile email";
-    
-    window.location.href = `${import.meta.env.VITE_JAUTH_BASE_URL}/oauth/authorize?response_type=code&scope=${SCOPE}&client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&origin_uri=${encodeURIComponent(ORIGIN_URI)}`;
-};
 
   if (user) return <Navigate to={from} replace />;
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center bg-black text-white">
-      <div className="backdrop-blur-xl bg-white/10 border border-white/20 w-full max-w-[400px] rounded-2xl p-8 flex flex-col items-center gap-6 transition-all hover:shadow-[#4242FA]/30">
-        <h1 className="text-2xl font-bold text-[#4242FA]">Welcome Back</h1>
+    <div className="w-screen h-screen flex justify-center items-center backgroundDiv text-white">
+      <div className="bg-black border-2 border-gray-700 w-full max-w-[400px] rounded-2xl p-8 flex flex-col items-center gap-6 transition-all hover:shadow-[0_0_20px_rgba(66,66,250,0.4)]">
+        <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
         <p className="text-gray-300 text-sm">Login to continue your journey</p>
 
-        <div className="flex justify-around w-3/4 border border-gray-500 rounded-xl p-1">
+        <div className="flex justify-center flex-wrap gap-2 w-full border border-gray-500 rounded-xl p-2">
           {roles.map((role) => (
             <span
               key={role}
-              className={`px-3 py-1 rounded-lg text-sm font-medium cursor-pointer transition-all ${
+              className={`px-3 py-1 rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all ${
                 formData.role === role ? "bg-[#4242FA] text-white" : "text-gray-300 hover:bg-[#4242FA]/20"
               }`}
               onClick={() => setFormData((prev) => ({ ...prev, role }))}
@@ -170,14 +152,10 @@ const jauthLogin = () => {
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={jauthLogin}
           />
-          {/* <FaGoogle
+          <FaGoogle
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
             onClick={googleLogin}
           />
-          <SiDash
-            className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
-            onClick={dauthLogin}
-          /> */}
         </div>
 
         <p className="text-gray-400 text-sm">
@@ -196,8 +174,8 @@ export function Signup() {
   const navigate = useNavigate();
   const { user, setUser } = useContext(authContext);
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ role: "client", username: "", email: "", password: "" });
-  const roles = ["client", "vendor"];
+  const [formData, setFormData] = useState({ role: "CLIENT", username: "", email: "", password: "" });
+  const roles = ["CLIENT", "DISTRIBUTOR", "EXHIBITOR"];
   const location = useLocation();
   const from = location.state?.from || "/";
   const [loading, setLoading] = useState(false);
@@ -232,7 +210,7 @@ export function Signup() {
         if (res.data.token) {
           setUser(res.data.user);
           localStorage.setItem("token", res.data.token);
-          navigate(formData.role !== "client" ? `/${formData.role}/` : from, { replace: true });
+          navigate(from === "/" ? "/home" : from, { replace: true });
         }
       })
       .catch((err) => {
@@ -244,16 +222,16 @@ export function Signup() {
   if (user) return <Navigate to={from} replace />;
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center bg-black to-[#1a0000] text-white">
-      <div className="bg-white/10 border border-white/20 w-full max-w-[400px] rounded-2xl p-8 flex flex-col items-center gap-6 transition-all hover:shadow-[#4242FA]/30">
-        <h1 className="text-2xl font-bold text-[#4242FA]">Create Account</h1>
+    <div className="w-screen h-screen flex justify-center items-center backgroundDiv text-white">
+      <div className="bg-black border-2 border-gray-700 w-full max-w-[400px] rounded-2xl p-8 flex flex-col items-center gap-6 transition-all hover:shadow-[0_0_20px_rgba(66,66,250,0.4)]">
+        <h1 className="text-3xl font-bold text-white">Create Account</h1>
         <p className="text-gray-300 text-sm">Join us today!</p>
 
-        <div className="flex justify-around w-3/4 border border-gray-500 rounded-xl p-1">
+        <div className="flex justify-center flex-wrap gap-2 w-full border border-gray-500 rounded-xl p-2">
           {roles.map((role) => (
             <span
               key={role}
-              className={`px-3 py-1 rounded-lg text-sm font-medium cursor-pointer transition-all ${
+              className={`px-3 py-1 rounded-lg text-xs md:text-sm font-medium cursor-pointer transition-all ${
                 formData.role === role ? "bg-[#4242FA] text-white" : "text-gray-300 hover:bg-[#4242FA]/20"
               }`}
               onClick={() => setFormData((prev) => ({ ...prev, role }))}
@@ -311,27 +289,13 @@ export function Signup() {
         </div>
 
         <div className="flex gap-6">
-          <FaGoogle
-            className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
-            onClick={() => {
-              const CLIENT_ID = "486170631932-5s4abs9lgv958ptc06ho5705r50i2ccb.apps.googleusercontent.com";
-              const REDIRECT_URI = `${BASE_URL}/auth/google/callback`;
-              const SCOPE = "openid email profile";
-              window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${encodeURIComponent(
-                SCOPE
-              )}`;
-            }}
-          />
           <SiDash
             className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
-            onClick={() => {
-              const CLIENT_ID = "lAOrfPy9uph9nGYe";
-              const REDIRECT_URI = `${BASE_URL}/auth/dauth/callback`;
-              const SCOPE = "email+user+profile+openid";
-              window.location.href = `https://auth.delta.nitt.edu/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=${encodeURIComponent(
-                SCOPE
-              )}&state=xyz&nonce=abc`;
-            }}
+            onClick={jauthLogin}
+          />
+          <FaGoogle
+            className="bg-white text-black p-2 rounded-full text-4xl cursor-pointer hover:scale-110 transition-all"
+            onClick={googleLogin}
           />
         </div>
 

@@ -7,7 +7,7 @@ import { IoLocationSharp } from 'react-icons/io5'
 import { authContext } from '../../contexts/authContext.jsx'
 import Loader from '../../components/loader.jsx'
 
-   let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+   let BASE_URL = import.meta.env.VITE_APP_URL
 
 function TicketSelection () {
   const navigate = useNavigate()
@@ -21,7 +21,8 @@ function TicketSelection () {
     date: dates[0],
     slot: null,
     placeId: null,
-    showId: null
+    showId: null,
+    occupancy: 0
   })
 
   console.log(dates[0])
@@ -57,27 +58,31 @@ function TicketSelection () {
 
         res.data.forEach(showData => {
           console.log(showData)
-          let id = showData[`${type}`]
+          let id = showData[`${type}`]?._id || showData[`${type}Id`] || showData[`${type}`];
+          if (!id) return;
           console.log(id)
+          const bookedSeatsCount = showData.bookedSeats?.length || 0;
           if (Data[id]) {
             Data[id].slots.push({
               slot: showData.slot,
-              showId: showData._id
+              showId: showData._id,
+              bookedSeatsCount
             })
           } else {
             Ids.push(id)
             Data[id] = {
-              slots: [{ slot: showData.slot, showId: showData._id }]
+              slots: [{ slot: showData.slot, showId: showData._id, bookedSeatsCount }]
             }
           }
         })
 
         let showsDetails = Ids.map(Id => {
-          axios
-            .get(`${BASE_URL}/${type}/find?${type}Id=${Id}&fields=name,location`)
+          return axios
+            .get(`${BASE_URL}/${type}/find?${type}Id=${Id}&fields=name,location,seatLayout`)
             .then(res => {
               Data[Id].name = res.data[0].name
               Data[Id].location = res.data[0].location
+              Data[Id].totalSeats = res.data[0].seatLayout?.totalSeats || 100
             })
         })
 
@@ -88,7 +93,20 @@ function TicketSelection () {
       })
   }
 
-  console.log(data.place)
+  const handleWaitlist = () => {
+    setLoading(true);
+    axios.post(`${BASE_URL}/waitlist/join`, {
+      userId: user._id,
+      showId: selected.showId,
+      email: user.email
+    }).then(res => {
+      alert("Successfully joined waitlist!");
+      setLoading(false);
+    }).catch(err => {
+      alert(err.response?.data?.error || "Error joining waitlist");
+      setLoading(false);
+    });
+  };
 
   return (
     <div className='backgroundDiv min-h-screen'>
@@ -112,16 +130,16 @@ function TicketSelection () {
             </div>
 
             <div className='dateContainer pt-4'>
-              <div className='dates flex gap-4 py-4'>
+              <div className='dates flex flex-wrap gap-4 py-4'>
                 {dates.map((date, idx) => {
-                  const d = new Date(date.split('T')[0]).toString().split(' ')
+                  const d = date ? new Date(date.split('T')[0]).toString().split(' ') : []
                   return (
                     <div
                       key={idx}
                       className={`dateContainer rounded-xl font-medium text-xl border-2 border-[#636363] hover:border-white p-2 px-4 flex flex-col justify-center items-center gap-2 cursor-pointer ${
                         selected.date == date ? 'bg-[#4242FA]' : ''
                       } ${
-                        idx > 2
+                        idx >= 4
                           ? 'text-[#5c5c5f] pointer-events-none'
                           : 'text-white'
                       }`}
@@ -142,10 +160,12 @@ function TicketSelection () {
 
               <div className='theaterContainer pt-4'>
                 <span className='title text-xl font-bold my-2'>
-                  {type === 'movie' ? 'Theater' : 'Stadium'}
+                  {entityType === 'movie' ? 'Theater' : 'Stadium'}
                 </span>
                 <div className='theaters flex gap-4 py-2 flex-col'>
-                  {Object.keys(data.place).map(theaterKey => {
+                  {!data.place || Object.keys(data.place).length === 0 ? (
+                    <div className="text-gray-400 font-bold py-10 text-xl text-center">No shows found</div>
+                  ) : Object.keys(data.place).map(theaterKey => {
                     return (
                       <div
                         key={theaterKey}
@@ -165,26 +185,31 @@ function TicketSelection () {
 
                         <div className='startTimes flex gap-4 py-4'>
                           {data.place[theaterKey].slots.map((s, idx) => {
+                            const occupancy = Math.round((s.bookedSeatsCount / (data.place[theaterKey].totalSeats || 1)) * 100) || 0;
                             return (
                               <div
                                 key={idx}
-                                className={`timeContainer rounded-lg text-white font-medium text-lg border-1 border-[#636363] hover:border-white p-1 px-2 flex flex-col justify-center items-center gap-2 cursor-pointer 
+                                className={`timeContainer rounded-lg text-white font-medium text-lg border-1 border-[#636363] hover:border-white p-2 px-3 flex flex-col justify-center items-center gap-1 cursor-pointer transition-colors duration-300
                              ${
                                selected.slot == s.slot &&
                                selected.placeId == theaterKey
-                                 ? 'bg-[#4242FA]'
-                                 : ''
+                                 ? 'bg-[#4242FA] border-[#4242FA]'
+                                 : 'hover:bg-white/5'
                              }`}
                                 onClick={() => {
                                   setSelected(prev => ({
                                     ...prev,
                                     placeId: theaterKey,
                                     slot: s.slot,
-                                    showId: s.showId
+                                    showId: s.showId,
+                                    occupancy: occupancy
                                   }))
                                 }}
                               >
                                 <span className='time'>{s.slot}</span>
+                                <span className={`text-xs font-normal px-2 py-0.5 rounded-full ${occupancy >= 90 ? 'bg-red-500/20 text-red-400' : occupancy >= 70 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'}`}>
+                                  {occupancy}% Full
+                                </span>
                               </div>
                             )
                           })}
@@ -195,25 +220,36 @@ function TicketSelection () {
                 </div>
               </div>
 
-            <div className='proceedContainer flex justify-center items-center pt-8 pb-10'>
-              <Link
-                to={`${
-                  selected.slot
-                    ? `/${entityType}/${_id}/${type}/${selected.showId}`
-                    : ''
-                }`}
-              >
-                <button
-                  className={`proceed p-2 px-4 border-2 rounded-lg cursor-pointer  text-lg font-bold border-[#636363]  active:bg-[#EA454c] ${
-                    selected.slot
-                      ? 'text-white hover:border-white'
-                      : 'text-[#5c5c5f] pointer-events-none'
-                  } `}
-                >
-                  Proceed
-                </button>
-              </Link>
-            </div>
+            {data.place && Object.keys(data.place).length > 0 && (
+              <div className='proceedContainer flex justify-center items-center pt-8 pb-10'>
+                {selected.occupancy >= 100 ? (
+                  <button
+                    onClick={handleWaitlist}
+                    className="proceed px-8 py-2 border-2 rounded-full cursor-pointer text-lg font-bold transition-all shadow-md text-white border-orange-500 bg-orange-500 hover:bg-orange-600 hover:border-orange-600 transform hover:scale-105"
+                  >
+                    Join Waitlist
+                  </button>
+                ) : (
+                  <Link
+                    to={`${
+                      selected.slot
+                        ? `/${entityType}/${_id}/${type}/${selected.showId}`
+                        : ''
+                    }`}
+                  >
+                    <button
+                      className={`proceed px-8 py-2 border-2 rounded-full cursor-pointer text-lg font-bold transition-all shadow-md ${
+                        selected.slot
+                          ? 'text-white border-[#4242FA] bg-[#4242FA] hover:bg-blue-600 hover:border-blue-600 transform hover:scale-105'
+                          : 'text-[#5c5c5f] border-[#636363] pointer-events-none'
+                      } `}
+                    >
+                      Proceed
+                    </button>
+                  </Link>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -225,10 +261,10 @@ export default TicketSelection
 
 const getDates = () => {
   let dates = []
-  let date = new Date('2025-08-06')
-  let count = 6
-  for (let i = 1; i <= count; i++) {
-    dates.push(date.toISOString())
+  let date = new Date()
+  let count = 7
+  for (let i = 0; i < count; i++) {
+    dates.push(date.toISOString().split('T')[0])
     date.setDate(date.getDate() + 1)
   }
   return dates

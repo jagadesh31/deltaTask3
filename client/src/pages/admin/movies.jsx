@@ -4,6 +4,7 @@
   
   import { useState, useEffect, useContext, createContext } from 'react'
   import { useNavigate, Link ,useLocation} from 'react-router-dom'
+  import { toast } from 'react-toastify'
   import '../../App.css'
   
   import Loader from '../../components/loader.jsx'
@@ -11,7 +12,7 @@
 
   export const dataContext = createContext()
 
-    let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+    let BASE_URL = import.meta.env.VITE_APP_URL
   
   export function Movies () {
     let { user, setUser } = useContext(authContext)
@@ -23,6 +24,7 @@
     let [newEntity,setNewEntity] = useState({});
     let [isOverlay,setIsOverlay] = useState(false);
     let [editingIdx,setEditingIdx] = useState(null);
+    let [modalConfig, setModalConfig] = useState({ isOpen: false });
     let location = useLocation()
 
     let def={'movies'  :{
@@ -34,1039 +36,14 @@
       writer : '',
       director : '',
       actors : '',
-      organizedBy:user._id,
+      addedBy:user._id,
       poster:'https://res.cloudinary.com/diizmtj04/image/upload/v1751881581/default_poster_payucm.jpg',
     },
     theaters : {
-      name:'',location:'',layout : {
-    "capacity": "200",
-    "seatsLayout": {
-      "rows": "10",
-      "columns": "20",
-      "seats": [
-        [
-          {
-            "id": "A1",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A2",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A3",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A4",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A5",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A6",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A7",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A8",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A9",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A10",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A11",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A12",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A13",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A14",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A15",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A16",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A17",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A18",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A19",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "A20",
-            "type": "vip",
-            "value": 1.5
-          }
-        ],
-        [
-          {
-            "id": "B1",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B2",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B3",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B4",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B5",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B6",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B7",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B8",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B9",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B10",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B11",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B12",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B13",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B14",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B15",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B16",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B17",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B18",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B19",
-            "type": "vip",
-            "value": 1.5
-          },
-          {
-            "id": "B20",
-            "type": "vip",
-            "value": 1.5
-          }
-        ],
-        [
-          {
-            "id": "C1",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C2",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C3",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C4",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C5",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C6",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C7",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C8",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C9",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C10",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C11",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C12",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C13",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C14",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C15",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C16",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C17",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C18",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C19",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "C20",
-            "type": "firstClass",
-            "value": 1.2
-          }
-        ],
-        [
-          {
-            "id": "D1",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D2",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D3",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D4",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D5",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D6",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D7",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D8",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D9",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D10",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D11",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D12",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D13",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D14",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D15",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D16",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D17",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D18",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D19",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "D20",
-            "type": "firstClass",
-            "value": 1.2
-          }
-        ],
-        [
-          {
-            "id": "E1",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E2",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E3",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E4",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E5",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E6",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E7",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E8",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E9",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E10",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E11",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E12",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E13",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E14",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E15",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E16",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E17",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E18",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E19",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "E20",
-            "type": "firstClass",
-            "value": 1.2
-          }
-        ],
-        [
-          {
-            "id": "F1",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F2",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F3",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F4",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F5",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F6",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F7",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F8",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F9",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F10",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F11",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F12",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F13",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F14",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F15",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F16",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F17",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F18",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F19",
-            "type": "firstClass",
-            "value": 1.2
-          },
-          {
-            "id": "F20",
-            "type": "firstClass",
-            "value": 1.2
-          }
-        ],
-        [
-          {
-            "id": "G1",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G2",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G3",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G4",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G5",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G6",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G7",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G8",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G9",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G10",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G11",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G12",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G13",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G14",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G15",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G16",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G17",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G18",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G19",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "G20",
-            "type": "secondClass",
-            "value": 1
-          }
-        ],
-        [
-          {
-            "id": "H1",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H2",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H3",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H4",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H5",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H6",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H7",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H8",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H9",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H10",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H11",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H12",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H13",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H14",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H15",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H16",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H17",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H18",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H19",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "H20",
-            "type": "secondClass",
-            "value": 1
-          }
-        ],
-        [
-          {
-            "id": "I1",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I2",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I3",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I4",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I5",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I6",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I7",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I8",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I9",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I10",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I11",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I12",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I13",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I14",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I15",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I16",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I17",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I18",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I19",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "I20",
-            "type": "secondClass",
-            "value": 1
-          }
-        ],
-        [
-          {
-            "id": "J1",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J2",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J3",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J4",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J5",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J6",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J7",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J8",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J9",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J10",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J11",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J12",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J13",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J14",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J15",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J16",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J17",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J18",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J19",
-            "type": "secondClass",
-            "value": 1
-          },
-          {
-            "id": "J20",
-            "type": "secondClass",
-            "value": 1
-          }
-        ]
-      ]
-    }
-  }
+      name:'',location:'',seatLayout: {
+        totalSeats: 0,
+        tiers: []
+      }
     },
 movieShows : {
       date:'',slot:'',movieid:'',theaterId:'',ticketsAvailable:'',ticketsBooked:''
@@ -1084,6 +61,16 @@ movieShows : {
           console.log(id)
     }
 
+    function approveEntity(id){
+      let entityType = currentOption.slice(0, currentOption.length - 1);
+      axios
+          .patch(`${BASE_URL}/${entityType}/update?id=${id}`, { status: 'ACTIVE' })
+          .then(res => {
+            fetchData();
+          })
+          .catch(err => console.error(err));
+    }
+
     function fetchData(){
         setLoading(true)
        axios
@@ -1093,7 +80,10 @@ movieShows : {
             console.log(res.data)
             setLoading(false)
           })
-          .catch(err => {})
+          .catch(err => {
+            setData([]);
+            setLoading(false);
+          })
     }
   
     useEffect(() => { 
@@ -1130,198 +120,257 @@ movieShows : {
             {loading ? <Loader/>:(
           <div className='main w-full py-4 flex flex-col gap-4'>
 
-            <header className='text-white flex justify-between items-center bg-[#cc3333] py-2 px-3 rounded-md'>
-              <span className="noofmovies">Total {currentOption.charAt(0).toUpperCase() + currentOption.slice(1)} : {data.length}</span>
-              <span className="add btn" onClick={()=>{setIsOverlay(true);setNewEntity(def[currentOption]);setIsEditing(false)}}>Add {currentOption.charAt(0).toUpperCase() + currentOption.slice(1)}</span>
-            </header>
 
-           {(currentOption === 'movies')&& <div className="moviesList gap-4 flex flex-col">
-           {data.map((movie,idx)=>{
-            return <MovieCards key={idx} idx={idx} show={movie} deleteEntity={deleteEntity} setIsEditing={setIsEditing} setNewEntity={setNewEntity} setEditingIdx={setEditingIdx} setIsOverlay={setIsOverlay} />
+            {(currentOption === 'movies')&& <div className="moviesList gap-4 flex flex-col">
+           {data.length === 0 ? <div className="text-center text-gray-400 py-10 text-xl font-bold">No movies found</div> : data.map((movie,idx)=>{
+            return <MovieCards key={idx} idx={idx} show={movie} deleteEntity={deleteEntity} approveEntity={approveEntity} setIsEditing={setIsEditing} setNewEntity={setNewEntity} setEditingIdx={setEditingIdx} setIsOverlay={setIsOverlay} setModalConfig={setModalConfig} />
            })}
            </div>}
 
            
            {(currentOption === 'theaters')&& <div className="theatersList gap-4 flex flex-col">
-           {data.map((theater,idx)=>{
-            return <TheaterCards key={idx} show={theater} idx={idx} deleteEntity={deleteEntity} setIsEditing={setIsEditing} setNewEntity={setNewEntity} setEditingIdx={setEditingIdx} setIsOverlay={setIsOverlay}/>
+           {data.length === 0 ? <div className="text-center text-gray-400 py-10 text-xl font-bold">No theaters found</div> : data.map((theater,idx)=>{
+            return <TheaterCards key={idx} show={theater} idx={idx} deleteEntity={deleteEntity} approveEntity={approveEntity} setIsEditing={setIsEditing} setNewEntity={setNewEntity} setEditingIdx={setEditingIdx} setIsOverlay={setIsOverlay} setModalConfig={setModalConfig} />
            })}
            </div>}
 
            
            {(currentOption === 'movieShows')&& <div className="showsList gap-2 md:gap-4 grid sm:grid-cols-2 xl:grid-cols-3">
-           {data.map((show,idx)=>{
-            return <ShowCards key={idx} show={show} idx={idx} deleteEntity={deleteEntity} setIsEditing={setIsEditing} setNewEntity={setNewEntity} setEditingIdx={setEditingIdx} setIsOverlay={setIsOverlay} location={location}/>
+           {data.length === 0 ? <div className="text-center text-gray-400 py-10 text-xl font-bold">No shows found</div> : data.map((show,idx)=>{
+            return <ShowCards key={idx} show={show} idx={idx} deleteEntity={deleteEntity} setIsEditing={setIsEditing} setNewEntity={setNewEntity} setEditingIdx={setEditingIdx} setIsOverlay={setIsOverlay} location={location} setModalConfig={setModalConfig} />
            })}
            </div>}
 
           </div>)}
 
+        {modalConfig.isOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80">
+            <div className="bg-[#0f121a] border border-gray-700 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+              <h2 className="text-xl font-bold text-white mb-4">{modalConfig.title}</h2>
+              <p className="text-gray-300 mb-8">{modalConfig.message}</p>
+              <div className="flex justify-end gap-4">
+                <button 
+                  onClick={() => setModalConfig({ isOpen: false })}
+                  className="px-4 py-2 rounded-lg font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={modalConfig.onConfirm}
+                  className="px-6 py-2 rounded-lg font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         </div>
       </div>
     )
   }
 
-  const MovieCards = ({show,deleteEntity,setIsEditing,setNewEntity,setEditingIdx,setIsOverlay,idx}) =>{
+  const MovieCards = ({show,deleteEntity,approveEntity,setIsEditing,setNewEntity,setEditingIdx,setIsOverlay,idx,setModalConfig}) =>{
 
-    return(
-      <div className="movieContainer border-2 border-[#eee] rounded-md">
-        <div className="movieInfo flex items-stretch gap-2 md:gap-4">
-        <div className="left flex justify-center items-center pl-2 md:pl-4">      
-        <div className='imageContainer overflow-hidden rounded-xl h-[140px] w-[95px] md:h-[250px] md:w-[175px] border-[#636363]  border-2'>
-          <img
-            src={show.poster}
-            draggable='false'
-            className='transition duration-500 ease-in-out hover:scale-105'
-          />
-      </div>
+      return(
+      <div className="trainContainer border border-gray-700 bg-black rounded-2xl p-4 flex flex-col md:flex-row gap-6 my-4 shadow-xl hover:shadow-2xl transition relative">
+
+        <div className="left flex-shrink-0 flex justify-center">
+          <div className="poster rounded-xl overflow-hidden h-[250px] w-[170px] shadow-lg border border-gray-800">
+              <img
+                src={show.poster}
+                alt='movie poster'
+                className='w-full h-full object-cover'
+              />
+          </div>
         </div>
-        <div className="right md:p-4 text-white text-md text-xs md:text-sm lg:text-lg flex items-stretch flex-col w-full">
-          <div className="header flex justify-between items-center gap-3 pr-2 py-2 w-full">
-          <span className="movieId text-[#757575]">MovieID : {show._id}</span>
-          <span className="options flex gap-3">
-            <FiEdit2 className='font-semibold md:text-2xl text-emerald-500' onClick={()=>{setNewEntity(show);setIsOverlay(true);
-              setIsEditing(true);setEditingIdx(idx);}}></FiEdit2>
-            <MdDeleteOutline className='text-red-600 font-semibold md:text-2xl ' onClick={()=>{deleteEntity(show._id);alert('delete')}}></MdDeleteOutline>
-          </span>
-        </div>
-          <li className="title pb-1"><strong>Title :</strong>{show.title}</li>
-          <li className="duration pb-1"><strong>Duration : </strong>{show.duration}</li>
-          <li className="languages pb-1"><strong>Languages : </strong>{show.language}</li>
-          <li className="genre pb-1"><strong>Genre : </strong>{show.genre.toString()}</li>
-          <li className="plot pb-1"><strong>Plot :</strong>{show.plot}</li>
-          <li className="director pb-1"><strong>Directors : </strong>{show.director.toString()}</li>
-          <li className="writer pb-1"><strong>Writers : </strong>{show.writer.toString()}</li>
-          <li className="actors pb-1"><strong>Actors : </strong>{show.actors.toString()}</li>
-          <li className="actors pb-1"><strong>organizedBy : </strong>{show.organizedBy}</li>
-        </div>
+        <div className="right flex flex-col w-full">
+          <div className="header flex justify-between items-center gap-3 border-b border-gray-800 pb-3 mb-3">
+            <span className="movieId text-gray-500 font-mono text-sm">MovieID : {show._id}</span>
+            <span className="options flex gap-4 items-center">
+              {show.status === 'PENDING_APPROVAL' && (
+                <button onClick={() => approveEntity(show._id)} className="bg-[#4242FA] hover:bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow-md">Approve</button>
+              )}
+              <FiEdit2 className='font-semibold md:text-2xl text-[#4242FA] hover:text-blue-400 cursor-pointer transition' onClick={()=>{setNewEntity(show);setIsOverlay(true);
+                setIsEditing(true);setEditingIdx(idx);}}></FiEdit2>
+              <MdDeleteOutline className='text-gray-400 hover:text-red-500 font-semibold md:text-2xl cursor-pointer transition' onClick={()=>{
+                setModalConfig({
+                  isOpen: true,
+                  title: 'Delete Movie',
+                  message: `Are you sure you want to delete "${show.title}"? This action cannot be undone.`,
+                  onConfirm: () => { deleteEntity(show._id); setModalConfig({isOpen: false}); }
+                });
+              }}></MdDeleteOutline>
+            </span>
+          </div>
+          <ul className="text-gray-300 text-sm md:text-base flex flex-col gap-2">
+            <li><strong className="text-white w-24 inline-block">Title :</strong>{show.title}</li>
+            <li><strong className="text-white w-24 inline-block">Duration :</strong>{show.duration} {show.duration?.toString().includes('min') ? '' : 'min'}</li>
+            <li><strong className="text-white w-24 inline-block">Languages :</strong>{show.language}</li>
+            <li><strong className="text-white w-24 inline-block">Genre :</strong>{show.genre?.toString() || 'N/A'}</li>
+            <li><strong className="text-white w-24 inline-block align-top">Plot :</strong><span className="text-gray-400 max-w-3xl inline-block">{show.plot}</span></li>
+            <li><strong className="text-white w-24 inline-block">Directors :</strong>{show.director?.toString() || 'N/A'}</li>
+            <li><strong className="text-white w-24 inline-block">Writers :</strong>{show.writer?.toString() || 'N/A'}</li>
+            <li><strong className="text-white w-24 inline-block">Actors :</strong>{show.actors?.toString() || 'N/A'}</li>
+            <li><strong className="text-white w-24 inline-block">Added By :</strong><span className="text-blue-400 font-mono text-sm">{show.addedBy?._id || (typeof show.addedBy === 'string' ? show.addedBy : '')}</span></li>
+          </ul>
         </div>
       </div>
     )
   }
 
-  const TheaterCards = ({show,deleteEntity,setIsEditing,setNewEntity,setEditingIdx,setIsOverlay,idx}) =>{
+  const TheaterCards = ({show,deleteEntity,approveEntity,setIsEditing,setNewEntity,setEditingIdx,setIsOverlay,idx,setModalConfig}) =>{
       const seatSizes = {
     height: 30,
     width: 30,
     gap: 10,
   };
     return(
-    <div className="trainContainer border-2 border-[#eee] rounded-md p-2 px-4">
+    <div className="trainContainer border border-gray-700 bg-black rounded-2xl p-6 flex flex-col my-4 shadow-xl hover:shadow-2xl transition relative">
 
-        <div className="header flex justify-between items-center gap-3 py-2">
-          <span className="movieId text-[#757575]">TheaterID : {show._id}</span>
-          <span className="options flex gap-3">
-            <FiEdit2 className='font-semibold md:text-2xl text-emerald-500' onClick={()=>{setNewEntity(show);setIsOverlay(true);
-              setIsEditing(true);setEditingIdx(idx);}}></FiEdit2>
-            <MdDeleteOutline className='text-red-600 font-semibold md:text-2xl ' onClick={()=>{deleteEntity(show._id);alert('delete')}}></MdDeleteOutline>
+
+        <div className="header flex justify-between items-center gap-3 border-b border-gray-800 pb-3 mb-4">
+          <span className="movieId text-gray-500 font-mono text-sm">TheaterID : {show._id}</span>
+          <span className="options flex gap-4 items-center">
+            {show.status === 'PENDING_APPROVAL' && (
+              <button onClick={() => approveEntity(show._id)} className="bg-[#4242FA] hover:bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow-md">Approve</button>
+            )}
+            <MdDeleteOutline className='text-gray-400 hover:text-red-500 font-semibold md:text-2xl cursor-pointer transition' onClick={()=>{
+              setModalConfig({
+                isOpen: true,
+                title: 'Delete Theater',
+                message: `Are you sure you want to delete theater "${show.name}"? This action cannot be undone.`,
+                onConfirm: () => { deleteEntity(show._id); setModalConfig({isOpen: false}); }
+              });
+            }}></MdDeleteOutline>
           </span>
         </div>
 
-        <div className="trainInfo flex flex-col md:flex-row items-center  justify-between md:justify-around gap-2 md:gap-4">
+        <div className="trainInfo flex flex-col md:flex-row items-center justify-between gap-6">
 
-        <div className="left md:p-4 text-white text-md text-xs md:text-sm lg:text-lg flex md:flex-col items-center md:items-start gap-4 justify-between">
-          <li className="trainNumber pb-1"><strong>Theater Name :</strong>{show.name}</li>
-          <li className="title pb-1"><strong>Location :</strong>{show.location}</li>
-          <li className="duration pb-1"><strong>Capacity : </strong>{show.layout?.capacity} seats</li>
+        <div className="left text-gray-300 text-sm md:text-base flex flex-col gap-2 w-full md:w-1/3">
+          <li><strong className="text-white w-32 inline-block">Theater Name :</strong>{show.name}</li>
+          <li><strong className="text-white w-32 inline-block">Location :</strong>{show.location}</li>
+          <li><strong className="text-white w-32 inline-block">Capacity :</strong>{show.seatLayout?.totalSeats ?? show.layout?.capacity ?? 0} seats</li>
         </div>
 
-        <div className="right seatLayout flex justify-center items-center pr-2 md:pr-4">      
-      <svg className="overflow-x-scroll overflow-y-scroll border-2 border-[#636363] p-2" width='400' height='250' viewBox={`0 0 ${820} ${500}`}>
-      {show.layout?.seatsLayout.seats.map((arr1, i) =>
-        arr1.map((seat, j) => {
-          let x;
-          if(j>9){
-          x = seatSizes.gap * (j) + seatSizes.width * j + 3*seatSizes.gap;
-          }else{
-          x = seatSizes.gap * (j) + seatSizes.width * j;
-          }
-         const y = seatSizes.gap * (i) + seatSizes.height * i;
-
-          return (
-            <svg key={`seat-${i}-${j}`} transform={`translate(${x}, ${y})`}>
-              <rect
-                width={seatSizes.width}
-                height={seatSizes.height}
-                fill='transparent'
-                stroke="gray"
-                strokeWidth="2"
-                rx="5"
-                ry="5"
-                className="cursor-pointer hover:border-white border-2 border-[#636363] transition duration-200"
-              />
-              <text
-                x={seatSizes.width / 2}
-                y={seatSizes.height / 2}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="12"
-                fill="white"
-                pointerEvents="none"
-                className='select-none'
-              >
-                {seat.id}
-              </text>
-            </svg>
-          );}))}
-    
-     <svg transform={`translate(${205}, ${460})`}>
-             <rect
-                width='410'
-                height='40'
-                fill='white'
-                stroke="gray"
-                strokeWidth="2"
-                rx="5"
-                ry="5"
-                className="cursor-pointer"
-              />
-              <text
-                x={410/2}
-                y={20}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontSize="20"
-                fill="black"
-                pointerEvents="none"
-                className='select-none'
-              >Screen</text>
-      </svg>
-    </svg>
+        <div className="right seatLayout flex justify-center items-center w-full md:w-2/3">      
+          {(() => {
+            let maxCols = 0;
+            let totalHeight = 0;
+            const tiers = show.seatLayout?.tiers || [];
+            if (tiers.length === 0) {
+              return (
+                <svg className="border border-gray-700 rounded-lg bg-gray-900 p-2 shadow-inner" width='100%' height='250' viewBox="0 0 820 500">
+                  <text x="410" y="220" textAnchor="middle" fill="gray" fontSize="24">No Seat Layout Configured</text>
+                </svg>
+              );
+            }
+            tiers.forEach(tier => {
+              const totalSeats = Number(tier.seatCapacity) || 0;
+              const rows = Number(tier.rows) || 1;
+              const cols = Math.ceil(totalSeats / rows);
+              if (cols > maxCols) maxCols = cols;
+              totalHeight += rows * (seatSizes.height + seatSizes.gap) + 20;
+            });
+            const maxWidth = Math.max(maxCols * (seatSizes.width + seatSizes.gap), 410);
+            totalHeight += 60;
+            const viewBoxStr = `0 0 ${maxWidth + 20} ${totalHeight}`;
+            let currentYOffset = 10;
+            
+            return (
+              <svg className="border border-gray-700 rounded-lg bg-gray-900 p-2 shadow-inner" width='100%' height='250' viewBox={viewBoxStr} preserveAspectRatio="xMidYMin meet">
+              {tiers.flatMap((tier, tIdx) => {
+                const totalSeats = Number(tier.seatCapacity) || 0;
+                const rows = Number(tier.rows) || 1;
+                const cols = Math.ceil(totalSeats / rows);
+                const seatsInTier = Array.from({ length: totalSeats });
+                
+                const tierElements = seatsInTier.map((_, i) => {
+                  const row = Math.floor(i / cols);
+                  const col = i % cols;
+                  
+                  const tierWidth = cols * (seatSizes.width + seatSizes.gap) - seatSizes.gap;
+                  const startX = (maxWidth - tierWidth) / 2 + 10;
+                  
+                  const x = startX + col * (seatSizes.width + seatSizes.gap);
+                  const y = currentYOffset + row * (seatSizes.height + seatSizes.gap);
+                  
+                  return (
+                    <svg key={`tier-${tIdx}-seat-${i}`} transform={`translate(${x}, ${y})`}>
+                      <rect width={seatSizes.width} height={seatSizes.height} fill={tIdx % 2 === 0 ? 'rgba(66, 66, 250, 0.2)' : 'transparent'} stroke={tIdx % 2 === 0 ? '#4242FA' : 'gray'} strokeWidth="2" rx="5" ry="5" className="cursor-pointer transition duration-200" />
+                      <text x={seatSizes.width / 2} y={seatSizes.height / 2} textAnchor="middle" dominantBaseline="middle" fontSize="12" fill="white" pointerEvents="none" className='select-none'>{i + 1}</text>
+                    </svg>
+                  );
+                });
+                
+                currentYOffset += rows * (seatSizes.height + seatSizes.gap) + 20;
+                return tierElements;
+              })}
+                <svg transform={`translate(${(maxWidth - 410) / 2 + 10}, ${currentYOffset + 10})`}>
+                   <rect width='410' height='40' fill='white' stroke="gray" strokeWidth="2" rx="5" ry="5" />
+                   <text x={410/2} y={20} textAnchor="middle" dominantBaseline="middle" fontSize="20" fill="black" pointerEvents="none" className='select-none'>Screen</text>
+                </svg>
+              </svg>
+            );
+          })()}
         </div>
         </div>
       </div>
     )
   }
 
-  const ShowCards = ({show,deleteEntity,setIsEditing,setNewEntity,setEditingIdx,setIsOverlay,idx,location}) =>{
+  const ShowCards = ({show,deleteEntity,setIsEditing,setNewEntity,setEditingIdx,setIsOverlay,idx,location,setModalConfig}) =>{
+    let totalCapacity = 0;
+    if (show.theater?.seatLayout?.tiers && show.theater.seatLayout.tiers.length > 0) {
+      totalCapacity = show.theater.seatLayout.tiers.reduce((acc, tier) => acc + (Number(tier.seatCapacity) || 0), 0);
+    } else {
+      totalCapacity = Number(show.theater?.capacity) || 100;
+    }
 
-   
+    let bookedCount = 0;
+    if (show.ticketsBooked && Array.isArray(show.ticketsBooked)) {
+      show.ticketsBooked.forEach(t => {
+        bookedCount += (t.seatsBooked?.length || 0);
+      });
+    }
+
+    const available = show.ticketsAvailable !== undefined ? show.ticketsAvailable : (totalCapacity - bookedCount);
+    const occupancy = totalCapacity > 0 ? ((bookedCount / totalCapacity) * 100).toFixed(1) : 0;
+
     return(
-      <div className="trainContainer border-2 border-[#eee] rounded-md p-2 px-4">
+      <div className="trainContainer border border-gray-700 bg-black rounded-2xl p-6 flex flex-col my-4 shadow-xl hover:shadow-2xl transition relative">
+
 
          <div className="trainInfo flex items-center justify-between gap-2 md:gap-4">
-          <div className="movieInfo flex flex-col items-stretch gap-2 md:gap-4">
+          <div className="movieInfo flex flex-col items-stretch gap-2 md:gap-4 w-full">
 
-          <div className="header flex justify-between items-center gap-3 pt-1">
-          <span className="movieId text-[#757575]">showID : {show._id}</span>
-          <span className="options flex self-end gap-3">
-            <FiEdit2 className='font-semibold md:text-2xl text-emerald-500' onClick={()=>{setNewEntity(show);setIsOverlay(true);
-              setIsEditing(true);setEditingIdx(idx);alert('edit')}}></FiEdit2>
-            <MdDeleteOutline className='text-red-600 font-semibold md:text-2xl ' onClick={()=>{deleteEntity(show._id);alert('delete')}}></MdDeleteOutline>
-          </span>
-        </div>
+          <div className="header flex justify-between items-center gap-3 border-b border-gray-800 pb-3 mb-2">
+            <span className="movieId text-gray-500 font-mono text-sm">showID : {show._id}</span>
+            <span className="options flex self-end gap-4 items-center">
+              <MdDeleteOutline className='text-gray-400 hover:text-red-500 font-semibold md:text-2xl cursor-pointer transition' onClick={()=>{
+                setModalConfig({
+                  isOpen: true,
+                  title: 'Delete Show',
+                  message: `Are you sure you want to delete this show for "${show.movie?.title}"?`,
+                  onConfirm: () => { deleteEntity(show._id); setModalConfig({isOpen: false}); }
+                });
+              }}></MdDeleteOutline>
+            </span>
+          </div>
 
-        <div className="right md:p-2 text-white text-md text-xs md:text-sm lg:text-lg flex items-stretch flex-col list-none">
-          <li className="duration pb-1"><strong>Date : </strong>{show.date.split('T')[0]}</li>
-          <li className="languages pb-1"><strong>Slot : </strong>{show.slot}</li>
-          <li className="trainNumber pb-1"><strong>Movie :</strong>{show.movie.title}</li>
-          <li className="title pb-1"><strong>Theater :</strong>{show.theater.name}</li>
-          <li className="totalDuration pb-1"><strong>TicketsAvailable : </strong>{show.ticketsAvailable}</li>
-        </div>
+          <ul className="text-gray-300 text-sm md:text-base flex flex-col gap-2">
+            <li><strong className="text-white w-36 inline-block">Date :</strong>{show.date?.split('T')[0]}</li>
+            <li><strong className="text-white w-36 inline-block">Slot :</strong>{show.slot}</li>
+            <li><strong className="text-white w-36 inline-block">Movie :</strong>{show.movie?.title}</li>
+            <li><strong className="text-white w-36 inline-block">Theater :</strong>{show.theater?.name}</li>
+            <li><strong className="text-white w-36 inline-block">Tickets Available :</strong>{available}</li>
+            <li><strong className="text-white w-36 inline-block">Occupancy :</strong><span className="font-bold text-emerald-400">{occupancy}%</span></li>
+          </ul>
 
-        <div className="footer py-2 flex items-center justify-center text-white">
-          <Link to={`/admin/show/movie/${show._id}`} state={{from:location.pathname}} className="viewAll btn">View Layout</Link>
+        <div className="footer py-3 flex items-center justify-center text-white mt-2">
+          <Link to={`/show/movie/${show._id}`} state={{from:location.pathname}} className="bg-[#4242FA] hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition shadow-md">View Layout</Link>
         </div>
 
         </div>
@@ -1342,24 +391,70 @@ movieShows : {
     setNewEntity(prev => ({ ...prev, [name]: value }))
   }
 
+  const handleTierChange = (index, field, value) => {
+    setNewEntity(prev => {
+      const newTiers = [...(prev.seatLayout?.tiers || [])];
+      newTiers[index] = { ...newTiers[index], [field]: field === 'seatCapacity' ? Number(value) : value };
+      const totalSeats = newTiers.reduce((acc, tier) => acc + (Number(tier.seatCapacity) || 0), 0);
+      return {
+        ...prev,
+        seatLayout: {
+          ...prev.seatLayout,
+          tiers: newTiers,
+          totalSeats
+        }
+      };
+    });
+  };
+
+  const addTier = () => {
+    setNewEntity(prev => {
+      const newTiers = [...(prev.seatLayout?.tiers || []), { name: '', seatCapacity: 0 }];
+      return {
+        ...prev,
+        seatLayout: { ...prev.seatLayout, tiers: newTiers }
+      };
+    });
+  };
+
+  const removeTier = (index) => {
+    setNewEntity(prev => {
+      const newTiers = prev.seatLayout.tiers.filter((_, i) => i !== index);
+      const totalSeats = newTiers.reduce((acc, tier) => acc + (Number(tier.seatCapacity) || 0), 0);
+      return {
+        ...prev,
+        seatLayout: { ...prev.seatLayout, tiers: newTiers, totalSeats }
+      };
+    });
+  };
+
   const submitHandler = ()=>{
-    let co = currentOption.slice(0,currentOption.length-1);
+      let co = currentOption.slice(0,currentOption.length-1);
+    console.log(co)
     if(isEditing){
-    axios
-          .patch(`http://localhost:5000/${co}/update?id=${newEntity._id}`,newEntity)
+      axios
+          .patch(`${BASE_URL}/${co}/update?id=${newEntity._id}`,newEntity)
           .then(res => {
             console.log(res.data);
             fetchData();
+            setIsOverlay(false);
+            setIsEditing(false);
           })
-          .catch(err => {})
+          .catch(err => {
+            toast.error(err.response?.data?.error || err.message || "Something went wrong");
+          })
     } else{
       axios
-          .post(`http://localhost:5000/${co}/add`,newEntity)
+          .post(`${BASE_URL}/${co}/add`,newEntity)
           .then(res => {
             console.log(res.data);
             fetchData();
+            setIsOverlay(false);
+            setIsEditing(false);
           })
-          .catch(err => {})
+          .catch(err => {
+            toast.error(err.response?.data?.error || err.message || "Something went wrong");
+          })
     }
 
   }
@@ -1369,30 +464,74 @@ movieShows : {
 
   console.log(isEditing)
   return (
-    <div className='overlayBackground w-screen h-screen fixed bg-[rbga(0,0,0,0.3)] flex items-center justify-center text-white'>
-           <div className='w-[70%] bg-[#12101D] rounded-lg border-amber-50'>
-        <div className='header bg-[#1E1A31] p-2 text-[19px] md:text-[21px] font-semibold'>{isEditing ? 'Edit' : 'Add'} {currentOption.charAt(0).toUpperCase() + currentOption.slice(1)}</div>
-        <div className='body p-4 flex flex-col gap-4 px-8'>
-          <div className='inputContainer grid grid-cols-1 gap-4 items-start '>
+    <div className='overlayBackground w-screen h-screen fixed inset-0 z-50 bg-black/80 flex items-center justify-center text-white'>
+           <div className='w-full max-w-2xl bg-black border border-gray-700 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]'>
+        <div className='header bg-gray-900 border-b border-gray-700 p-5 text-xl font-bold'>{isEditing ? 'Edit' : 'Add'} {currentOption.charAt(0).toUpperCase() + currentOption.slice(1)}</div>
+        <div className='body p-8 overflow-y-auto custom-scrollbar flex-1 flex flex-col gap-5'>
+          <div className='inputContainer grid grid-cols-1 gap-5 items-start'>
           {inputOptions[currentOption].map((input,idx)=>{
-            console.log(input)
-            return(
-              <div className="inputContainer grid grid-cols-4 text-[18px] md:text-[20px] font-medium text-white" key={idx}>
-                <label htmlFor={input}>{input}</label>
-              <input
-                type='text'
-                name={input}
-                id={input}
-                placeholder={`Enter ${input}`}
-                value={newEntity[input]}
-                className='border-2 px-2 border-white focus:outline-none col-span-3 text-[16px] md:text-[18px] text-white'
-                onChange={handleChange}
-                pattern='/\S/'
-              />
+            let fieldHtml;
+            if (input === 'genre') {
+              fieldHtml = (
+                <select name={input} id={input} value={newEntity[input] || ''} onChange={handleChange} className='px-3 py-2 border border-gray-700 bg-black rounded-lg focus:outline-none focus:border-[#4242FA] focus:ring-1 focus:ring-[#4242FA] col-span-3 text-[15px] md:text-[16px] text-white transition-all'>
+                   <option value="">Select a Genre</option>
+                   <option value="Action">Action</option>
+                   <option value="Comedy">Comedy</option>
+                   <option value="Drama">Drama</option>
+                   <option value="Horror">Horror</option>
+                   <option value="Romance">Romance</option>
+                   <option value="Sci-Fi">Sci-Fi</option>
+                   <option value="Thriller">Thriller</option>
+                   <option value="Adventure">Adventure</option>
+                </select>
+              );
+            } else if (input === 'duration') {
+              fieldHtml = <input type="number" min="1" max="500" name={input} id={input} placeholder="e.g. 120 (in mins)" value={newEntity[input] || ''} onChange={handleChange} className='px-3 py-2 border border-gray-700 bg-black rounded-lg focus:outline-none focus:border-[#4242FA] focus:ring-1 focus:ring-[#4242FA] col-span-3 text-[15px] md:text-[16px] text-white transition-all' />
+            } else if (input === 'plot') {
+              fieldHtml = <textarea name={input} id={input} placeholder={`Enter ${input}`} value={newEntity[input] || ''} onChange={handleChange} className='px-3 py-2 border border-gray-700 bg-black rounded-lg focus:outline-none focus:border-[#4242FA] focus:ring-1 focus:ring-[#4242FA] col-span-3 text-[15px] md:text-[16px] text-white transition-all' maxLength="500" rows="3" />
+            } else {
+              fieldHtml = <input type="text" name={input} id={input} placeholder={`Enter ${input}`} value={newEntity[input] || ''} onChange={handleChange} className='px-3 py-2 border border-gray-700 bg-black rounded-lg focus:outline-none focus:border-[#4242FA] focus:ring-1 focus:ring-[#4242FA] col-span-3 text-[15px] md:text-[16px] text-white transition-all' maxLength="100" />
+            }
+            return (
+              <div className="inputContainer grid grid-cols-4 text-[16px] md:text-[17px] font-medium text-white items-start gap-4" key={idx}>
+                <label htmlFor={input} className="pt-2">{input.charAt(0).toUpperCase() + input.slice(1)}</label>
+                {fieldHtml}
               </div>
             )
           })}
 
+            {currentOption === 'theaters' && (
+              <div className="col-span-full bg-[#1e2330] p-5 rounded-xl border border-gray-700 mt-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-white">Seat Layout Tiers</h3>
+                  <div className="text-gray-300 text-sm font-semibold">
+                    Total Seats: <span className="text-[#4242FA]">{newEntity.seatLayout?.totalSeats || 0}</span>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col gap-3">
+                  {(newEntity.seatLayout?.tiers || []).map((tier, idx) => (
+                    <div key={idx} className="flex items-center gap-4 bg-black p-3 rounded-lg border border-gray-800">
+                      <div className="flex-1 flex flex-col">
+                        <label className="text-xs text-gray-500 mb-1">Tier Name (e.g. VIP, Standard)</label>
+                        <input type="text" value={tier.name} onChange={(e) => handleTierChange(idx, 'name', e.target.value)} className="bg-transparent border-b border-gray-700 focus:border-[#4242FA] outline-none text-white text-sm pb-1" placeholder="Tier Name" />
+                      </div>
+                      <div className="flex-1 flex flex-col">
+                        <label className="text-xs text-gray-500 mb-1">Capacity</label>
+                        <input type="number" min="1" value={tier.seatCapacity} onChange={(e) => handleTierChange(idx, 'seatCapacity', e.target.value)} className="bg-transparent border-b border-gray-700 focus:border-[#4242FA] outline-none text-white text-sm pb-1" placeholder="Capacity" />
+                      </div>
+                      <button onClick={() => removeTier(idx)} className="text-red-500 hover:text-red-400 p-2 mt-4" title="Remove Tier">
+                        <MdDeleteOutline size={20} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                
+                <button onClick={addTier} className="mt-4 flex items-center justify-center w-full py-2 border-2 border-dashed border-gray-600 rounded-lg text-gray-400 hover:text-white hover:border-gray-400 transition">
+                  + Add Tier
+                </button>
+              </div>
+            )}
             {/* <>
               <label htmlFor='age'>Age(in years)</label>
               <input
@@ -1440,29 +579,21 @@ movieShows : {
           </div>
         </div>
 
-        <div className='footer p-2 flex justify-between'>
-          <span
-            className='cancel btn'
-            onClick={() => {
-              setIsOverlay(false)
-            }}
+        <div className='footer p-5 border-t border-gray-700 bg-[#161b26] flex justify-end gap-4'>
+          <button
+            className='px-6 py-2 rounded-lg font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition'
+            onClick={() => setIsOverlay(false)}
           >
-            CANCEL
-          </span>
-          <span
-            className='add btn'
+            Cancel
+          </button>
+          <button
+            className='px-8 py-2 rounded-lg font-bold text-white bg-[#4242FA] hover:bg-blue-600 shadow-lg transform transition hover:scale-105'
             onClick={() => {
               submitHandler();
-              if (!isEditing) {
-                setIsOverlay(false)
-              } else {
-                setIsOverlay(false)
-                setIsEditing(false)
-              }
             }}
           >
-            {isEditing ? 'UPDATE' : 'ADD'}
-          </span>
+            {isEditing ? 'UPDATE' : `ADD`}
+          </button>
         </div>
       </div>
     </div>

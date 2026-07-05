@@ -9,7 +9,10 @@ import '../../App.css'
 import Loader from '../../components/loader.jsx'
 import { TransactionElement } from '../../components/transactionElement.jsx'
 
-let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+let AUTH_URL = import.meta.env.VITE_AUTH_URL
+let PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL
+let EMAIL_URL = import.meta.env.VITE_EMAIL_URL
+let APP_URL = import.meta.env.VITE_APP_URL
 
 export const MyBookings = () => {
   const navigate = useNavigate();
@@ -21,36 +24,29 @@ export const MyBookings = () => {
  
   const filterData = (data) => {
     const filtered = data.filter((d) => {
-        return d.status === "PAID";
+        return d.status === "SUCCESS";
     });
     setFilteredData(filtered);
     console.log(filtered)
     setLoading(false);
   }
 
-  function cancelTicket(transactionId){
-        setLoading(true);
-    axios
-        .post(`${BASE_URL}/transaction/cancel?transactionId=${transactionId}`)
-        .then(res => {
-        console.log(res.data)
-         setTimeout(()=>fetchData(),1000)})
-        .catch(err => {})
-  }
-
 
 
   function fetchData(){
      axios
-        .get(`${BASE_URL}/auth/find?id=${user._id}`)
+        .get(`${AUTH_URL}/auth/find?id=${user._id}`)
         .then(res => {
         const filtered = res.data.users.myTransactions.filter((d) => {
-        return d.status === "PAID";
+        return d.status === "SUCCESS";
          });
           setFilteredData(filtered);
           console.log(filtered)
           setLoading(false);
-        }).catch(err => {})
+        }).catch(err => {
+          setFilteredData([]);
+          setLoading(false);
+        })
   }
 
   useEffect(() => {
@@ -71,12 +67,12 @@ export const MyBookings = () => {
           {loading ? <Loader/> : (<div className="transactions flex flex-col gap-4">
                         {filteredData.length === 0 && 
             <div className='min-h-[70Vh] flex justify-center items-center'>
-             <span className="text-xl font-extrabold text-red-500 flex flex-col justify-center items-center"><GiSpectacleLenses className="text-4xl"></GiSpectacleLenses>
+             <span className="text-xl font-extrabold text-gray-400 flex flex-col justify-center items-center"><GiSpectacleLenses className="text-4xl"></GiSpectacleLenses>
              <span>No Bookings Found</span></span>
             </div>
             }
                {filteredData.length > 0 && filteredData.map((transaction,idx)=>{
-            return <BookingsElement transaction={transaction} cancelTicket={cancelTicket} key={idx}/>})}
+            return <BookingsElement transaction={transaction} key={idx}/>})}
         </div>)}
       </div>
     </div>
@@ -84,11 +80,33 @@ export const MyBookings = () => {
 }
 
 
-function BookingsElement({transaction,cancelTicket}){
+function BookingsElement({transaction}){
 
-  function downloadHandler(link_id){
-    console.log(link_id)
-   axios.get(`${BASE_URL}/pdf/download?link_id=${link_id}`,{
+  const [poster, setPoster] = useState(transaction.metaData.poster);
+
+  useEffect(() => {
+    if (!poster && transaction.metaData.showId) {
+      if (transaction.purpose === 'movie') {
+         axios.get(`${APP_URL}/movieShow/find?showId=${transaction.metaData.showId}`)
+           .then(res => {
+             if(res.data && res.data.length > 0) {
+               setPoster(res.data[0].movie?.poster);
+             }
+           }).catch(err => console.error(err));
+      } else if (transaction.purpose === 'concert') {
+         axios.get(`${APP_URL}/concertShow/find?showId=${transaction.metaData.showId}`)
+           .then(res => {
+             if(res.data && res.data.length > 0) {
+               setPoster(res.data[0].concert?.poster);
+             }
+           }).catch(err => console.error(err));
+      }
+    }
+  }, [transaction.metaData.showId, transaction.purpose, poster]);
+
+  function downloadHandler(orderId){
+    console.log(orderId)
+   axios.get(`${EMAIL_URL}/pdf/download?orderId=${orderId}`,{
     responseType: 'arraybuffer'
    }).then(res=>{
     const url = URL.createObjectURL(new Blob([res.data],{type:'application/pdf'}))
@@ -100,83 +118,52 @@ function BookingsElement({transaction,cancelTicket}){
     a.remove();
    })
   }
- 
-  if(transaction.purpose==='movie'){
+
+  // Calculate generic entity name depending on purpose
+  const entityName = transaction.purpose === 'movie' ? transaction.metaData.movie : transaction.metaData.concert;
+  const venue = transaction.purpose === 'movie' ? transaction.metaData.theater : transaction.metaData.venue;
+
   return(
-    <div className="transactionContainer border-2 border-white text-white rounded-lg">
+    <div className="bg-black border border-gray-700 text-white rounded-xl shadow-lg overflow-hidden flex flex-col sm:flex-row">
         
-        <div className="header flex justify-between py-2 bg-blue-400 border-b-2 border-white text-black">
-        <span className="bookedAt text-lg font-extrabold px-2">Booked on : <span className="bookedAt text-lg font-normal">{transaction.createdAt.split('T')[0]}</span></span>
-        <span className={`totalAmount font-bold text-lg px-2`}>Amount paid : <span className="bookedAt text-lg font-normal">₹{transaction.amount}</span></span>
+        {/* Left Side: Poster */}
+        <div className="w-full sm:w-1/4 min-h-[200px] flex-shrink-0 bg-black border-r border-gray-700 flex items-center justify-center overflow-hidden">
+            {poster ? (
+              <img src={poster} alt={entityName} className="w-full h-full object-cover" />
+            ) : (
+              <Loader />
+            )}
         </div>
 
-      <span className="leftContainer flex flex-col gap-2 bg-white text-black px-2">
-        <span className="bookedAt text-lg font-extrabold">Date : <span className="bookedAt text-lg font-normal">{transaction.metaData.date.split('T')[0]}</span></span>
-        <span className="bookedAt text-lg font-extrabold">slot : <span className="bookedAt text-lg font-normal">{transaction.metaData.slot}</span></span>
-        <span className="entityType text-lg font-extrabold">ShowId : <span className="bookedAt text-lg font-normal">{transaction.metaData.showId}</span></span>
-        <span className="entityType text-lg font-extrabold">Movie : <span className="bookedAt text-lg font-normal">{transaction.metaData.movie}</span></span>
-        <span className="entityType text-lg font-extrabold">Theater : <span className="bookedAt text-lg font-normal">{transaction.metaData.theater}</span></span>
-        <span className="entityType text-lg font-extrabold">seatsBooked : <span className="bookedAt text-lg font-normal">{transaction.metaData.seatsBooked.toString()}</span></span>
-      </span> 
-  
+        {/* Right Side: Details */}
+        <div className="flex-1 flex flex-col">
+          <div className="header flex justify-between items-center py-3 px-5 border-b border-gray-700 bg-black">
+            <span className="text-sm font-semibold text-gray-300">
+              Booked on: <span className="text-white">{transaction.createdAt.split('T')[0]}</span>
+            </span>
+            <span className="font-bold text-md px-3 py-1 bg-[#4242FA]/20 text-[#4242FA] rounded-full border border-[#4242FA]/30 shadow-sm">
+              Paid: ₹{transaction.totalAmount ?? transaction.amount}
+            </span>
+          </div>
 
-      <div className="footer flex justify-between bg-white text-black py-3 px-2">
-        <span className="btn" onClick={()=>{cancelTicket(transaction._id)}}>Cancel Booking</span>
-         <span className="btn" onClick={()=>{console.log('helo');downloadHandler(transaction.link_id)}}>Download Ticket</span>
-      </div>
-    </div>
-  )}
-
-  if(transaction.purpose==='concert'){
-  return(
-    <div className="transactionContainer border-2 border-white text-white rounded-lg">
-        
-        <div className="header flex justify-between py-2 bg-blue-400 border-b-2 border-white text-black">
-        <span className="bookedAt text-lg font-extrabold px-2">Booked on : <span className="bookedAt text-lg font-normal">{transaction.createdAt.split('T')[0]}</span></span>
-        <span className={`totalAmount font-bold text-lg px-2`}>Amount paid : <span className="bookedAt text-lg font-normal">₹{transaction.amount}</span></span>
+          <div className="content flex-1 py-4 px-5 grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-6 text-sm text-gray-300 bg-[#050301]">
+            <p><span className="font-semibold text-white">Date:</span> {transaction.metaData.date?.split('T')[0]}</p>
+            <p><span className="font-semibold text-white">Slot:</span> {transaction.metaData.slot}</p>
+            <p className="truncate" title={transaction._id}><span className="font-semibold text-white">Transaction ID:</span> {transaction._id}</p>
+            <p className="truncate" title={entityName}><span className="font-semibold text-white">{transaction.purpose === 'movie' ? 'Movie:' : 'Concert:'}</span> {entityName}</p>
+            <p className="truncate" title={venue}><span className="font-semibold text-white">Venue:</span> {venue}</p>
+            <p className="md:col-span-2"><span className="font-semibold text-white">Seats Booked:</span> <span className="tracking-wider">{transaction.metaData.seatsBooked?.join(', ')}</span></p>
+          </div>
+      
+          <div className="footer flex justify-end items-center bg-black py-3 px-5 border-t border-gray-700">
+            <button 
+              className="bg-[#4242FA] hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg transition shadow-md transform hover:scale-105" 
+              onClick={() => downloadHandler(transaction.orderId)}
+            >
+              Download Ticket
+            </button>
+          </div>
         </div>
-
-      <span className="leftContainer flex flex-col gap-2 bg-white text-black px-2">
-        <span className="bookedAt text-lg font-extrabold">Date : <span className="bookedAt text-lg font-normal">{transaction.metaData.date.split('T')[0]}</span></span>
-        <span className="bookedAt text-lg font-extrabold">slot : <span className="bookedAt text-lg font-normal">{transaction.metaData.slot}</span></span>
-        <span className="entityType text-lg font-extrabold">ShowId : <span className="bookedAt text-lg font-normal">{transaction.metaData.showId}</span></span>
-        <span className="entityType text-lg font-extrabold">Concert : <span className="bookedAt text-lg font-normal">{transaction.metaData.concert}</span></span>
-        <span className="entityType text-lg font-extrabold">Stadium : <span className="bookedAt text-lg font-normal">{transaction.metaData.stadium}</span></span>
-        <span className="entityType text-lg font-extrabold">seatsBooked : <span className="bookedAt text-lg font-normal">{transaction.metaData.seatsBooked.toString()}</span></span>
-      </span> 
-  
-
-      <div className="footer flex justify-between bg-white text-black py-3 px-2">
-        <span className="btn" onClick={()=>{cancelTicket(transaction._id)}}>Cancel Booking</span>
-         <span className="btn" onClick={()=>{console.log('helo');downloadHandler(transaction.link_id)}}>Download Ticket</span>
-      </div>
     </div>
-  )}
-
-    if(transaction.purpose==='train'){
-  return(
-    <div className="transactionContainer border-2 border-white text-white rounded-lg">
-        
-        <div className="header flex justify-between py-2 bg-blue-400 border-b-2 border-white text-black">
-        <span className="bookedAt text-lg font-extrabold px-2">Booked on : <span className="bookedAt text-lg font-normal">{transaction.createdAt.split('T')[0]}</span></span>
-        <span className={`totalAmount font-bold text-lg px-2`}>Amount paid : <span className="bookedAt text-lg font-normal">₹{transaction.amount}</span></span>
-        </div>
-
-      <span className="leftContainer flex flex-col gap-2 bg-white text-black px-2">
-        <span className="bookedAt text-lg font-extrabold">Date : <span className="bookedAt text-lg font-normal">{transaction.metaData.journeyDate.split('T')[0]}</span></span>
-        <span className="entityType text-lg font-extrabold">Train Name : <span className="bookedAt text-lg font-normal">{transaction.metaData.trainName}(#{transaction.metaData.trainNumber})</span></span>
-        <span className="bookedAt text-lg font-extrabold">From : <span className="bookedAt text-lg font-normal">{transaction.metaData.from}</span></span>
-        <span className="entityType text-lg font-extrabold">To : <span className="bookedAt text-lg font-normal">{transaction.metaData.to}</span></span>
-        <span className="entityType text-lg font-extrabold">Duration : <span className="bookedAt text-lg font-normal">{transaction.metaData.duration}</span></span>
-        <span className="entityType text-lg font-extrabold">Arrival Time: <span className="bookedAt text-lg font-normal">{transaction.metaData.arrivalTime}</span></span>
-        <span className="entityType text-lg font-extrabold">Destination Time : <span className="bookedAt text-lg font-normal">{transaction.metaData.arrivalTime}</span></span>
-      </span> 
-  
-
-      <div className="footer flex justify-between bg-white text-black py-3 px-2">
-        <span className="btn" onClick={()=>{cancelTicket(transaction._id)}}>Cancel Booking</span>
-        <span className="btn" onClick={()=>{console.log('helo');downloadHandler(transaction.link_id)}}>Download Ticket</span>
-      </div>
-    </div>
-  )}
+  )
 }

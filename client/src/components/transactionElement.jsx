@@ -1,55 +1,38 @@
-export function TransactionElement({transaction}){
+export function TransactionElement({transaction, onCancel}){
 
- 
-  if(transaction.purpose==='movie'){
+  if(transaction.purpose==='movie' || transaction.purpose==='concert'){
   return(
-    <div className="transactionContainer rounded-2xl">
-        <div className={`header flex justify-between py-3  ${transaction.status === 'PAID'?'bg-green-500' : 'bg-red-500'} w-full text-black`}>
+    <div className="transactionContainer rounded-2xl relative">
+        <div className={`header flex justify-between py-3  ${(transaction.status === 'SUCCESS' || transaction.status === 'PAID') ?'bg-green-500' : (transaction.status === 'CANCELLED' ? 'bg-orange-500' : 'bg-red-500')} w-full text-black`}>
         <span className="bookedAt text-lg font-bold px-2">Booked on : <span className="bookedAt text-lg font-normal">{transaction.createdAt.split('T')[0]}</span></span>
 
         <span className="rightContainer flex flex-col items-center">
-        <span className={`totalAmount font-bold text-lg px-2`}>Amount : <span className="bookedAt text-lg font-normal">₹{transaction.amount}</span></span>
+        <span className={`totalAmount font-bold text-lg px-2`}>Amount : <span className="bookedAt text-lg font-normal">₹{transaction.amount || transaction.totalAmount}</span></span>
         <span className={`status text-lg font-bold`}>{transaction.status}</span>
       </span>
         </div>
 
-      <span className="leftContainer flex flex-col gap-2 bg-white text-black px-2 py-2">
-        <span className="bookedAt text-lg font-bold">Date : <span className="bookedAt text-lg font-normal">{transaction.metaData.date.split('T')[0]}</span></span>
-        <span className="bookedAt text-lg font-bold">slot : <span className="bookedAt text-lg font-normal">{transaction.metaData.slot}</span></span>
-        <span className="entityType text-lg font-bold">ShowId : <span className="bookedAt text-lg font-normal">{transaction.metaData.showId}</span></span>
-        <span className="entityType text-lg font-bold">MovieId : <span className="bookedAt text-lg font-normal">{transaction.metaData.movie}</span></span>
-        <span className="entityType text-lg font-bold">TheaterId : <span className="bookedAt text-lg font-normal">{transaction.metaData.theater}</span></span>
-        <span className="entityType text-lg font-bold">SeatsBooked : <span className="bookedAt text-lg font-normal">{transaction.metaData.seatsBooked.toString()}</span></span>
+      <span className="leftContainer flex flex-col gap-2 bg-[#1A1A2E] text-white px-2 py-4 rounded-b-2xl">
+        <span className="bookedAt text-lg font-bold">Date : <span className="bookedAt text-lg font-normal">{transaction.metaData?.date?.split('T')[0]}</span></span>
+        <span className="bookedAt text-lg font-bold">Slot : <span className="bookedAt text-lg font-normal">{transaction.metaData?.slot}</span></span>
+        <span className="entityType text-lg font-bold">Show : <span className="bookedAt text-lg font-normal">{transaction.metaData?.movie || transaction.metaData?.concert}</span></span>
+        <span className="entityType text-lg font-bold">Theater : <span className="bookedAt text-lg font-normal">{transaction.metaData?.theater}</span></span>
+        <span className="entityType text-lg font-bold">Seats : <span className="bookedAt text-lg font-normal">{transaction.metaData?.seatsBooked?.toString()}</span></span>
+        
+        {(transaction.status === 'SUCCESS' || transaction.status === 'PAID') && onCancel && (
+          <button 
+            onClick={() => onCancel(transaction)}
+            className="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-max"
+          >
+            Cancel Ticket
+          </button>
+        )}
       </span> 
-
 
     </div>
   )}
 
-  if(transaction.purpose==='concert'){
-  return(
-    <div className="transactionContainer rounded-xl">
-        <div className={`header flex justify-between py-3  ${transaction.status === 'PAID'?'bg-green-500' : 'bg-red-500'} w-full text-black`}>
-        <span className="bookedAt text-lg font-extrabold px-2">Booked on : <span className="bookedAt text-lg font-normal">{transaction.createdAt.split('T')[0]}</span></span>
 
-        <span className="rightContainer flex flex-col items-center">
-        <span className={`totalAmount font-bold text-lg px-2`}>Amount : <span className="bookedAt text-lg font-normal">₹{transaction.amount}</span></span>
-        <span className={`status text-lg font-bold`}>{transaction.status}</span>
-      </span>
-        </div>
-
-      <span className="leftContainer flex flex-col gap-2 bg-white text-black px-2 py-2">
-        <span className="bookedAt text-lg font-extrabold">Date : <span className="bookedAt text-lg font-normal">{transaction.metaData.date.split('T')[0]}</span></span>
-        <span className="bookedAt text-lg font-extrabold">slot : <span className="bookedAt text-lg font-normal">{transaction.metaData.slot}</span></span>
-        <span className="entityType text-lg font-extrabold">ShowId : <span className="bookedAt text-lg font-normal">{transaction.metaData._id}</span></span>
-        <span className="entityType text-lg font-extrabold">ConcertId : <span className="bookedAt text-lg font-normal">{transaction.metaData.concert}</span></span>
-        <span className="entityType text-lg font-extrabold">StadiumId : <span className="bookedAt text-lg font-normal">{transaction.metaData.stadium}</span></span>
-        <span className="entityType text-lg font-extrabold">SeatsBooked : <span className="bookedAt text-lg font-normal">{transaction.metaData.toString()}</span></span>
-      </span> 
-
-
-    </div>
-  )}
 
     if(transaction.purpose==='train'){
   return(

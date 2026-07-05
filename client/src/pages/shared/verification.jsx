@@ -3,7 +3,7 @@ import axios from 'axios'
 import {useState,useEffect,useContext} from 'react'
 import { authContext } from './../../contexts/authContext';
 
-   let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+   let BASE_URL = import.meta.env.VITE_AUTH_URL
 
 export function EmailVerification(){
   let {user,setUser} = useContext(authContext);

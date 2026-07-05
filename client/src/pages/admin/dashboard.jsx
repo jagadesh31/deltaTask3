@@ -3,22 +3,16 @@ import axios from 'axios'
 import { useNavigate,Link } from "react-router-dom";
 import {useContext,useEffect,useRef,useState,useMemo} from 'react'
 import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  Title 
-} from 'chart.js';
-
-
-import {Bar,Doughnut,Line} from 'react-chartjs-2'
-ChartJS.register(ArcElement, Tooltip, Legend, Title); 
-  import '../../App.css'
+  PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend as RechartsLegend, ResponsiveContainer
+} from 'recharts';
+import '../../App.css'
   
-  import Loader from '../../components/loader.jsx'
-  import { authContext } from '../../contexts/authContext.jsx'
+import Loader from '../../components/loader.jsx'
+import { authContext } from '../../contexts/authContext.jsx'
 
-  let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+let PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL
+let AUTH_URL = import.meta.env.VITE_AUTH_URL
+let APP_URL = import.meta.env.VITE_APP_URL
 
 export function AdminDashboard(){
   let navigate = useNavigate()
@@ -27,101 +21,73 @@ export function AdminDashboard(){
   let [transactionsData, setTransactionsData] = useState([])
   let [loading, setLoading] = useState(true)
   const [topPerforming,setTopPerforming] = useState([]);
+  let [totalMovies, setTotalMovies] = useState(0)
+  let [totalTheaters, setTotalTheaters] = useState(0)
  
- const {
-  totalTransactions,
-  totalAmount,
-  totalSuccessfulTransactions,
-  totalSuccessfulAmount,
-  totalFailedTransactions,
-  totalFailedAmount,
-  totalClients,
-  totalVerifiedClients,
-  totalVendors,
-  totalVerifiedVendors,
-} = useMemo(() => {
-  let tTransactions = transactionsData.length;
-  let tAmount = 0;
-  let tSuccess = 0;
-  let tSuccessAmount = 0;
-  let tFailed = 0;
-  let tFailedAmount = 0;
-
-  transactionsData.forEach(({ amount, status }) => {
-    tAmount += amount;
-    if (status === 'FAILED') {
-      tFailed++;
-      tFailedAmount += amount;
-    } else {
-      tSuccess++;
-      tSuccessAmount += amount;
-    }
+  let [analytics, setAnalytics] = useState({
+    totalTransactions: 0,
+    totalAmount: 0,
+    successfulTransactions: 0,
+    successfulAmount: 0,
+    failedTransactions: 0,
+    failedAmount: 0,
+    cancelledTransactions: 0,
+    cancelledAmount: 0
   });
 
-  let cClients = 0, vClients = 0, cVendors = 0, vVendors = 0;
-  usersData.forEach(({ role, isVerified }) => {
-    if (role === 'client') {
-      cClients++;
-      if (isVerified) vClients++;
-    } else if (role === 'vendor') {
-      cVendors++;
-      if (isVerified) vVendors++;
-    }
-    
-  });
+  const {
+    totalClients,
+    totalExhibitors,
+    totalDistributors,
+  } = useMemo(() => {
+    let cClients = 0, cExhibitors = 0, cDistributors = 0;
+    usersData.forEach(({ role }) => {
+      const r = role.toLowerCase();
+      if (r === 'client') {
+        cClients++;
+      } else if (r === 'exhibitor') {
+        cExhibitors++;
+      } else if (r === 'distributor') {
+        cDistributors++;
+      }
+    });
 
-  return {
-    totalTransactions: tTransactions,
-    totalAmount: tAmount,
-    totalSuccessfulTransactions: tSuccess,
-    totalSuccessfulAmount: tSuccessAmount,
-    totalFailedTransactions: tFailed,
-    totalFailedAmount: tFailedAmount,
-    totalClients: cClients,
-    totalVerifiedClients: vClients,
-    totalVendors: cVendors,
-    totalVerifiedVendors: vVendors,
-  };
-}, [transactionsData, usersData]);
+    return {
+      totalClients: cClients,
+      totalExhibitors: cExhibitors,
+      totalDistributors: cDistributors,
+    };
+  }, [usersData]);
 
 
   useEffect(() => {
         setLoading(true)
  
      axios
-        .get(`${BASE_URL}/transaction/find`)
+        .get(`${PAYMENT_URL}/transaction/analytics`)
         .then(res => {
-          setTransactionsData(res.data);
+          setAnalytics(res.data);
           axios
-         .get(`${BASE_URL}/auth/find?role=all`)
+         .get(`${AUTH_URL}/auth/find?role=all`)
          .then(r => {
             setUsersData(r.data.users);
             axios
-            .get(`${BASE_URL}/movieShow/find?top=3`)
+            .get(`${APP_URL}/movieShow/find?top=3`)
               .then(r1=>{
                 let d1 = r1.data;
                 d1.forEach((d,idx)=>{
-                  axios.get(`${BASE_URL}/movie/find?movieId=${d.movie}`)
+                  axios.get(`${APP_URL}/movie/find?movieId=${d.movie}`)
                   .then(r2=>{d1[idx].entityData = r2.data})
                 })
-                axios
-                 .get(`${BASE_URL}/concertShow/find?top=2`)
-                    .then(r3=>{
-                      let d2 = r3.data;
-                       d2.forEach((d,idx)=>{
-                  axios.get(`${BASE_URL}/concert/find?concertId=${d.concert}`)
-                  .then(r2=>{d2[idx].entityData = r2.data;
-                                    let top =[...d1,...d2]
-                console.log(top)
-                    setTopPerforming(top)
-            setTimeout(()=>{
-              setLoading(false);
-              },500)
-                  })
-                })
+                
+                setTopPerforming(d1)
+                
+                axios.get(`${APP_URL}/movie/find`).then(res => setTotalMovies(res.data.length)).catch(err => {})
+                axios.get(`${APP_URL}/theater/find`).then(res => setTotalTheaters(res.data.length)).catch(err => {})
 
-                   
-              })
+                setTimeout(()=>{
+                  setLoading(false);
+                },500)
               })
             })
             .catch(err => {})
@@ -131,167 +97,128 @@ export function AdminDashboard(){
 
       
   return (
-   <div className="backgroundDiv">
-    <div className="container">
-      <div className="header py-2 bg-[#0092cc] text-[#f0f0f0] font-bold pl-2 text-[20px] md:text-[26px]">Dashboard</div>
+    <div className="backgroundDiv min-h-screen pt-28 pb-10 text-white font-sans px-6 relative overflow-hidden bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]">
+      {/* Decorative Glow Orbs */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-[#4242FA] rounded-full mix-blend-multiply filter blur-[150px] opacity-20 pointer-events-none"></div>
+      <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-600 rounded-full mix-blend-multiply filter blur-[150px] opacity-20 pointer-events-none"></div>
 
-      <br/>
+      <div className="container mx-auto max-w-7xl relative z-10">
+        <header className='backdrop-blur-xl bg-white/5 border border-white/10 p-8 rounded-3xl shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center mb-10'>
+          <div>
+            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-2 tracking-tight">Admin Dashboard</h1>
+            <div className="text-gray-400 font-medium tracking-wide">Overview of Platform Performance</div>
+          </div>
+        </header>
 
-     {loading?<Loader/>:(
-            <div className="body flex gap-4 flex-col">
-
-        <div className="topPerformingEvents  text-white">
-            <EntityContainer data={topPerforming} title="Top Performing"/>
-        </div>
-
-        <div className="transactionsBox text-white flex justify-around items-center">
-
-          {/* <div className="header flex justify-between p-4 border-b-2">
-           <span className="heading text-[19px] md:text-[21px]">Transactions</span>
-           <Link to='/admin/transactions' className="viewAll cursor-pointer text-[19px] md:text-[21px]">View All</Link>
+     {loading ? (
+       <div className="flex justify-center items-center min-h-[50vh]"><Loader/></div>
+     ) : (
+        <div className="body flex flex-col gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          
+          <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center hover:-translate-y-2 hover:bg-white/10 hover:shadow-[#4242FA]/30 hover:border-white/30 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-3xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+            <div className="text-gray-400 text-xs text-center font-bold uppercase tracking-[0.2em] mb-4 relative z-10 group-hover:text-gray-200 transition-colors">Total Movies</div>
+            <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-400 drop-shadow-md relative z-10 group-hover:scale-110 transition-transform duration-500">{totalMovies}</div>
           </div>
 
-           <div className="transactions flex flex-wrap justify-between items-center gap-4 py-4 px-6">
-
-            <span className="total flex text-[18px] md:text-[20px]">
-              <span className="right flex flex-col items-start gap-2">
-              <span className="totalTransactions">
-               Total Transactions : {totalTransactions}
-              </span>
-              <span className="totalAmount">
-               Total Amount : {totalAmount}
-              </span>
-            </span>
-            </span>
- 
-            <span className="successful text-[18px] md:text-[20px]">
-              <span className="right flex flex-col items-start gap-2">
-              <span className="totalTransactions">
-                Successful Transactions :{totalSuccessfulTransactions}
-              </span>
-              <span className="totalAmount">
-                Total Amount : {totalSuccessfulAmount}
-              </span>
-            </span>
-            </span>
-
-            <span className="failed text-[18px] md:text-[20px]">
-              <span className="right flex flex-col items-start gap-2">
-              <span className="totalTransactions">
-                  Failed Transactions :  {totalFailedTransactions}
-              </span>
-              <span className="totalAmount">
-                Total Amount : {totalFailedAmount}
-              </span>
-             </span>
-            </span>
-           </div> */}
-      
-      <div className="transactionsContainer border-amber-100 border-1">
-<Doughnut
-  data={{
-    labels: ['Total', 'Successful', 'Failed'],
-    datasets: [
-      {
-        label: 'Transactions',
-        data: [totalSuccessfulTransactions, totalFailedTransactions],
-        backgroundColor: ['green', 'red'],
-        borderRadius: 1
-      }
-    ]
-  }}
-  options={{
-    plugins: {
-      title: {
-        display: true,
-        text: 'Transactions Overview',
-        font: {
-          size: 18,
-          weight: 'bold'
-        },
-        color: 'white',
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      },
-      legend: {
-        position: 'bottom'
-      }
-    }
-  }}
-/>
-</div>
-
-      <div className="moneyContainer border-amber-100 border-1">
-        <Doughnut data={{
-          labels:['Successful','Failed'],
-          datasets:[
-            {label:'Amount',
-            data:[totalSuccessfulAmount,totalFailedAmount],
-            backgroundColor:[
-              'green',
-              'red'
-            ]
-          },
-        ]}} 
-      
-  options={{
-    plugins: {
-      title: {
-        display: true,
-        text: 'Revenue Overview',
-        font: {
-          size: 18,
-          weight: 'bold'
-        },
-        color: 'white',
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      },
-      legend: {
-        position: 'bottom'
-      }
-    }
-  }}/>
-        </div>
-
-        </div>
-
-        <div className="usersBox border-amber-100 border-1 text-white text-[18px] md:text-[20px]">
-
-          <div className="header flex flex-wrap justify-between p-4 border-b-2">
-           <span className="heading text-[19px] md:text-[21px]">Users</span>
-           <span className="viewAll cursor-pointer" onClick={()=>{navigate('/admin/home')}}>View All</span>
+          <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center hover:-translate-y-2 hover:bg-white/10 hover:shadow-purple-500/30 hover:border-white/30 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute -inset-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+            <div className="text-gray-400 text-xs text-center font-bold uppercase tracking-[0.2em] mb-4 relative z-10 group-hover:text-gray-200 transition-colors">Total Theaters</div>
+            <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-400 drop-shadow-md relative z-10 group-hover:scale-110 transition-transform duration-500">{totalTheaters}</div>
           </div>
 
-           <div className="transactions flex justify-between items-center gap-4 py-4 px-6">
+          <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center hover:-translate-y-2 hover:bg-white/10 hover:shadow-cyan-500/30 hover:border-white/30 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-3xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+            <div className="text-gray-400 text-xs text-center font-bold uppercase tracking-[0.2em] mb-4 relative z-10 group-hover:text-gray-200 transition-colors">Total Clients</div>
+            <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-cyan-400 to-blue-600 drop-shadow-md relative z-10 group-hover:scale-110 transition-transform duration-500">{totalClients}</div>
+          </div>
 
-            <span className="total flex flex-col items-start">
-              <span className="totalClients">
-               Total Clients : {totalClients}
-              </span>
-              <span className="totalAmount">
-               Total Verified Clients : {totalVerifiedClients}
-            </span>
-            </span>
+          <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center hover:-translate-y-2 hover:bg-white/10 hover:shadow-emerald-500/30 hover:border-white/30 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-3xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+            <div className="text-gray-400 text-xs text-center font-bold uppercase tracking-[0.2em] mb-4 relative z-10 group-hover:text-gray-200 transition-colors">Total Exhibitors</div>
+            <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-emerald-400 to-teal-600 drop-shadow-md relative z-10 group-hover:scale-110 transition-transform duration-500">{totalExhibitors}</div>
+          </div>
 
-            <span className="successful right flex flex-col items-start gap-2">
-              <span className="totalTransactions">
-                Total Vendors :{totalVendors}
-              </span>
-              <span className="totalAmount">
-                Total Verifed Vendors : {totalVerifiedVendors}
-              </span>
-            </span>
-
-           </div>
+          <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl p-6 shadow-2xl flex flex-col items-center justify-center hover:-translate-y-2 hover:bg-white/10 hover:shadow-orange-500/30 hover:border-white/30 transition-all duration-500 group relative overflow-hidden">
+            <div className="absolute -inset-1 bg-gradient-to-r from-orange-500 to-rose-500 rounded-3xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+            <div className="text-gray-400 text-xs text-center font-bold uppercase tracking-[0.2em] mb-4 relative z-10 group-hover:text-gray-200 transition-colors">Total Distributors</div>
+            <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-orange-400 to-rose-600 drop-shadow-md relative z-10 group-hover:scale-110 transition-transform duration-500">{totalDistributors}</div>
+          </div>
 
         </div>
 
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+          <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl p-10 shadow-2xl flex flex-col items-center min-h-[450px] justify-center relative hover:shadow-[#4242FA]/10 transition-shadow duration-500">
+            <h2 className="absolute top-8 left-0 right-0 text-center text-white/90 text-2xl font-extrabold tracking-widest uppercase">Transactions Count</h2>
+            {analytics.totalTransactions === 0 ? (
+              <div className="text-gray-400 font-medium text-lg italic mt-12 bg-white/5 py-3 px-8 rounded-full border border-white/10">No transactions yet</div>
+            ) : (
+              <div className="w-full h-full max-h-[300px] flex justify-center mt-16 relative">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Successful', value: analytics.successfulTransactions },
+                        { name: 'Failed', value: analytics.failedTransactions },
+                        { name: 'Cancelled', value: analytics.cancelledTransactions }
+                      ].filter(d => d.value > 0)}
+                      cx="50%" cy="50%" innerRadius={80} outerRadius={120} paddingAngle={5} dataKey="value"
+                    >
+                      <Cell fill="#4242FA" />
+                      <Cell fill="#ef4444" />
+                      <Cell fill="#f97316" />
+                    </Pie>
+                    <RechartsTooltip contentStyle={{ backgroundColor: '#1A1A2E', borderColor: '#ffffff20', color: 'white' }} />
+                    <RechartsLegend verticalAlign="bottom" height={36} wrapperStyle={{ color: 'white' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex items-center justify-center top-[-25px] pointer-events-none">
+                  <div className="text-center">
+                    <div className="text-3xl font-black text-white">{analytics.totalTransactions}</div>
+                    <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Total</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-3xl p-10 shadow-2xl flex flex-col items-center min-h-[450px] justify-center relative hover:shadow-[#4242FA]/10 transition-shadow duration-500">
+            <h2 className="absolute top-8 left-0 right-0 text-center text-white/90 text-2xl font-extrabold tracking-widest uppercase">Revenue Overview</h2>
+            {analytics.totalTransactions === 0 ? (
+              <div className="text-gray-400 font-medium text-lg italic mt-12 bg-white/5 py-3 px-8 rounded-full border border-white/10">No revenue yet</div>
+            ) : (
+              <div className="w-full h-full max-h-[300px] flex justify-center mt-16 relative">
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Admin Revenue', value: analytics.successfulAmount },
+                        { name: 'Failed Amount', value: analytics.failedAmount },
+                        { name: 'Cancelled Amount', value: analytics.cancelledAmount }
+                      ].filter(d => d.value > 0)}
+                      cx="50%" cy="50%" innerRadius={80} outerRadius={120} paddingAngle={5} dataKey="value"
+                    >
+                      <Cell fill="#10b981" />
+                      <Cell fill="#ef4444" />
+                      <Cell fill="#f97316" />
+                    </Pie>
+                    <RechartsTooltip formatter={(value) => `₹${value}`} contentStyle={{ backgroundColor: '#1A1A2E', borderColor: '#ffffff20', color: 'white' }} />
+                    <RechartsLegend verticalAlign="bottom" height={36} wrapperStyle={{ color: 'white' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute inset-0 flex items-center justify-center top-[-25px] pointer-events-none">
+                  <div className="text-center">
+                    <div className="text-2xl font-black text-white">₹{analytics.totalAmount}</div>
+                    <div className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">Volume</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        </div>
      )}
 
     </div>
@@ -303,36 +230,26 @@ export function AdminDashboard(){
 function EntityContainer (props) {
   let scrollRef = useRef(null)
 
-  const scroll = x => {
-    let scrollX = scrollRef.current.scrollLeft
-    scrollRef.current.scrollTo(scrollX + x, 0)
-  }
-
   return (
     <div className='w-full'>
-      <br />
-      <div className='title text-18px md:text-20px text-white text-sm font-medium pb-3 md:pb-4 md:text-xl md:font-bold'>
-        Top Performing
+      <div className='title text-2xl text-white font-bold pb-6'>
+        {props.title}
       </div>
 
       <div
         style={{ userSelect: 'none' }}
         className='moviesScrollContainer flex items-center'
       >
-        {/* <span className="leftArrow hidden md:block text-4xl text-white font-bold pr-4 cursor-pointer active:text-[#4242FA]" onClick={()=>{scroll(-200)}}>{'<'}</span> */}
         <div
           style={{ scrollbarWidth: 'none', scrollBehavior: 'smooth' }}
           ref={scrollRef}
-          className='overflow-y-hidden flex gap-4 md:gap-6 lg:gap-7 overflow-x-auto scroll-mr-12 '
+          className='overflow-y-hidden flex gap-6 overflow-x-auto pb-4'
         >
           {props.data.map((show, idx) => {
               return <ShowsCard key={idx} show={show} />
           })}
         </div>
-        {/* <span className="rightArrow hidden md:block text-4xl text-white font-bold pl-4 cursor-pointer active:text-[#4242FA]" onClick={()=>{scroll(200)}}>{'>'}</span> */}
       </div>
-
-      <br />
     </div>
   )
 }
@@ -344,18 +261,17 @@ export function ShowsCard (props) {
     : 'https://res.cloudinary.com/diizmtj04/image/upload/v1751881581/default_poster_payucm.jpg'
 
   return (
-    <div className='cardContainer cursor-pointer'>
-      <div className='imageContainer overflow-hidden rounded-xl h-[185px] w-[130px] md:h-[285px] md:w-[200px] border-[#636363] hover:border-white border-2'>
+    <div className='cardContainer cursor-pointer flex-shrink-0 group'>
+      <div className='imageContainer overflow-hidden rounded-xl h-[285px] w-[200px] border border-white/20 shadow-lg group-hover:shadow-2xl group-hover:border-white/50 transition-all duration-300 relative'>
         <img
           src={poster}
           draggable='false'
-          className='transition duration-500 ease-in-out hover:scale-105'
+          className='transition duration-500 ease-in-out group-hover:scale-110 w-full h-full object-cover'
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4">
+          <span className="text-white font-semibold">View Details</span>
+        </div>
       </div>
     </div>
   )
-}
-
-
-
- 
+} 

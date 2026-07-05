@@ -9,16 +9,15 @@
   import Loader from '../../components/loader.jsx'
   import { authContext } from '../../contexts/authContext.jsx'
 
-    let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+    let BASE_URL = import.meta.env.VITE_AUTH_URL
 
   export const dataContext = createContext()
   
   export function AdminHome () {
     let { user, setUser } = useContext(authContext)
-    let options = ['movies', 'trains', 'concerts']
+    let options = ['movies']
     let [genres, setGenres] = useState({
-      movies: ['Recommended', 'Action', 'Sci-Fi', 'Horror', 'Thriller'],
-      concerts: ['Recommended', 'Pop', 'Rock']
+      movies: ['Recommended', 'Action', 'Sci-Fi', 'Horror', 'Thriller']
     })
     let [currentOption, setCurrentOption] = useState('movies')
     let [search, setSearch] = useState('')
@@ -71,17 +70,7 @@
            })}
            </div>}
 
-          {(currentOption === 'concerts')&& <div className="concertsList gap-4 flex flex-col">
-           {data.map((concert,idx)=>{
-            return <ConcertCards key={idx} show={concert}/>
-           })}
-           </div>}
 
-            {(currentOption === 'trains')&& <div className="trainsList gap-4 flex flex-col">
-           {data.map((train,idx)=>{
-            return <TrainCards key={idx} show={train}/>
-           })}
-           </div>}
 
           </div>)}
 
@@ -97,7 +86,7 @@
         <div className="movieInfo flex items-stretch gap-2 md:gap-4">
         <div className="left flex justify-center items-center pl-2 md:pl-4">      
         <div className='imageContainer overflow-hidden rounded-xl h-[150px] w-[105px] md:h-[250px] md:w-[175px] lg:h-[300px] lg:w-[210px] border-[#636363]  border-2'>
-        <Link to={`/${show.type}/${show._id}`} state={show}>
+        <Link to={`/${show.type.toLowerCase()}/${show._id}`} state={show}>
           <img
             src={show.poster}
             draggable='false'
@@ -127,107 +116,4 @@
       </div>
     )
   }
-
-  const ConcertCards = ({show}) =>{
-    console.log(show)
-    return(
-      <div className="concertContainer border-2 border-[#eee] rounded-md">
-        <div className="concertInfo flex items-stretch gap-2 md:gap-4">
-        <div className="left flex justify-center items-center pl-2 md:pl-4">      
-        <div className='imageContainer overflow-hidden rounded-xl h-[150px] w-[105px] md:h-[250px] md:w-[175px] lg:h-[300px] lg:w-[210px] border-[#636363]  border-2'>
-        <Link to={`/${show.type}/${show._id}`} state={show}>
-          <img
-            src={show.poster}
-            draggable='false'
-            className='transition duration-500 ease-in-out hover:scale-105'
-          />
-        </Link>
-      </div>
-        </div>
-        <div className="right md:p-4 text-white text-md text-xs md:text-sm lg:text-lg flex items-stretch flex-col">
-        <div className="header flex justify-between items-center gap-3 pr-2 py-2">
-          <span className="movieId text-[#757575]">ConcertId : {show._id}</span>
-          <span className="options flex gap-3">
-            <FiEdit2 className='font-semibold md:text-2xl text-emerald-500' onClick={()=>alert('edit')}></FiEdit2>
-            <MdDeleteOutline className='text-red-600 font-semibold md:text-2xl ' onClick={()=>alert('delete')}></MdDeleteOutline>
-          </span>
-        </div>
-          <li className="title pb-1"><strong>Title :</strong>{show.title}</li>
-          <li className="duration pb-1"><strong>Duration : </strong>{show.duration}</li>
-          <li className="languages pb-1"><strong>Languages : </strong>{show.language}</li>
-          <li className="genre pb-1"><strong>Genre : </strong>{show.genre}</li>
-          <li className="plot pb-1"><strong>Plot :</strong>{show.plot}</li>
-          <li className="artist pb-1"><strong>Artist : </strong>{show.artist}</li>
-          <li className="ageRestriction pb-1"><strong>Age Restriction : </strong>{show.ageRestriction}</li>
-        </div>
-        </div>
-      </div>
-    )
-  }
-  
- const TrainCards = ({show}) =>{
-
-  console.log(show)
-    
-    let totalDistance = 0;
-
-  function getDuration () {
-
-    console.log(show.stations)
-    let length= show.stations.length;
-    let startTime = show.stations[0].departureTime;
-    let endTime = show.stations[length-1].arrivalTime;
-    totalDistance = show.stations[length-1].distance - show.stations[0].distance;
-
-    let arrival = new Date(
-      0,
-      0,
-      0,
-      endTime.slice(0, 2),
-      endTime.slice(3),0
-    )
-    let departure = new Date(
-      0,
-      0,
-      0,
-      startTime.slice(0, 2),
-      startTime.slice(3),0
-    )
-    let duration = (arrival - departure) / 1000
-    let hours = Math.floor(duration / (60 * 60))
-    let minutes = (duration / 60) % 60
-    return `${hours}h ${minutes}min`
-  }
-    return(
-      <div className="trainContainer border-2 border-[#eee] rounded-md p-2 px-4">
-
-        <div className="header flex justify-between items-center gap-3 py-2">
-          <span className="movieId text-[#757575]">TrainID : {show._id}</span>
-          <span className="options flex gap-3">
-            <FiEdit2 className='font-semibold md:text-2xl text-emerald-500' onClick={()=>alert('edit')}></FiEdit2>
-            <MdDeleteOutline className='text-red-600 font-semibold md:text-2xl ' onClick={()=>alert('delete')}></MdDeleteOutline>
-          </span>
-        </div>
-
-        <div className="trainInfo flex items-center justify-between gap-2 md:gap-4">
-
-        <div className="left md:p-4 text-white text-md text-xs md:text-sm lg:text-lg flex items-stretch flex-col">
-          <li className="trainNumber pb-1"><strong>Train Number :</strong>{show.trainNumber}</li>
-          <li className="title pb-1"><strong>Train Name :</strong>{show.trainName}</li>
-          <li className="duration pb-1"><strong>Train Type : </strong>{show.trainType}</li>
-          <li className="totalDuration pb-1"><strong>Total Duration : </strong>{getDuration()}</li>
-          <li className="totalDistance pb-1"><strong>Total Distance : </strong>{totalDistance}Km</li>
-          <li className="languages pb-1"><strong>Days of Operation : </strong>{show.daysOfOperation}</li>
-        </div>
-
-        <div className="right flex justify-center items-center pr-2 md:pr-4">      
-              <svg viewBox='0 0 300 300' height='300' width='300' className='bg-amber-500'>
-                  <rect x ='50' y='0' width='30' height='300' fill='cyan' stroke-width='2' stroke-style='white'/>
-              </svg>
-        </div>
-        </div>
-      </div>
-    )
-  }
-
-  
+

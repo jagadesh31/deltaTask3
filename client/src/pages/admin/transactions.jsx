@@ -9,7 +9,7 @@ import { GiSpectacleLenses } from "react-icons/gi";
 import Loader from '../../components/loader.jsx'
 
 
-let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
+let BASE_URL = import.meta.env.VITE_PAYMENT_URL
 
 
 export const Transactions = () => {
@@ -27,14 +27,13 @@ export const Transactions = () => {
     setLoading(true)
     const filtered = data.filter((d) => {
       if (currentFilter === 'successful') {
-        return d.status === "PAID";
+        return d.status === "SUCCESS";
       } else if (currentFilter === 'failed') {
         return d.status === "FAILED";
       }
       return true;
     });
-    console.log(filtered)
-    setFilteredData(filtered.reverse());
+    setFilteredData([...filtered].reverse());
     setLoading(false);
   }, [data, currentFilter]);
 
@@ -59,15 +58,6 @@ export const Transactions = () => {
     {loading ? <Loader/> : ( <div className="container flex flex-col gap-2">
         <div className="header w-full flex flex-col ">
           <div className="heading font-extrabold text-[30px] py-2">Transactions</div>
-
-          <div className="balance py-2 flex flex-between px-4 w-full gap-8">
-            <div className="amount"><span className="title font-bold">YOUR BALANCE : </span>{user.amountAvailable}</div>
-
-            <div className="monthSummary">
-              <div className="amount"><span className="title font-bold">This Month : </span>{user.amountAvailable}</div>
-            </div>
-          </div>
-
         </div>
 
         <br />
@@ -100,35 +90,52 @@ export const Transactions = () => {
                       }
           
             
-                    {filteredData.length > 0 &&  <div className="transactions w-full flex justify-center items-center overflow-x-auto">
-                      <table className='py-[12px] px-[15px] text-start border-[1px] border-[#ddd]'>
-                        <thead>
-                          <tr className='bg-[#f8f9fa] text-black w-full text-[16px] md:text-[18px]'>
-                           <th className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>S.No</th>
-                            <th className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>TransactionId</th>
-                            <th className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>Date</th>
-                            <th className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>Paid By</th>
-                            <th className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>Paid To</th>
-                            <th className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>Purpose</th>
-                            <th className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>Amount</th>
-                            <th className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredData.map((transaction, idx) => {
-                            return (<tr className='py-[12px] px-[15px] text-start border-b-[1px] border-[#ddd] border-[1px]' key={idx}>
-                              <td className='py-[12px] px-[15px] text-start border-b-[1px] border-[#ddd]'>{idx+1}</td>
-                              <td className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>{transaction._id}</td>
-                              <td className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>{transaction?.metaData.date?.split('T')[0]}</td>
-                              <td className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>{transaction.user?.email}</td>
-                              <td className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>{transaction.vendor?.email}</td>
-                              <td className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>{transaction.purpose.charAt(0).toUpperCase()+ transaction.purpose.slice(1)}</td>
-                              <td className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>{transaction.amount}</td>
-                              <td className='py-[12px] px-[18px] text-start border-b-[1px] border-[#ddd]'>{transaction.status}</td>
-                            </tr>)})}
-                        </tbody>
-                      </table>
-                    </div>}
+                    {filteredData.length > 0 && (
+                      <div className="w-full overflow-x-auto rounded-2xl border border-gray-700 bg-black shadow-2xl p-4">
+                        <table className='w-full text-left border-collapse'>
+                          <thead>
+                            <tr className='text-white/70 text-sm uppercase tracking-wider border-b border-white/10'>
+                              <th className='py-4 px-6 font-medium'>S.No</th>
+                              <th className='py-4 px-6 font-medium'>Transaction ID</th>
+                              <th className='py-4 px-6 font-medium'>Date</th>
+                              <th className='py-4 px-6 font-medium'>Paid By</th>
+                              <th className='py-4 px-6 font-medium'>Paid To</th>
+                              <th className='py-4 px-6 font-medium'>Purpose</th>
+                              <th className='py-4 px-6 font-medium'>Amount</th>
+                              <th className='py-4 px-6 font-medium'>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className='divide-y divide-white/5'>
+                            {filteredData.map((transaction, idx) => {
+                              return (
+                                <tr className='hover:bg-gray-900 transition duration-300 group' key={idx}>
+                                  <td className='py-4 px-6 text-white/90'>{idx+1}</td>
+                                  <td className='py-4 px-6 font-mono text-sm text-[#a1a1aa]'>{transaction._id}</td>
+                                  <td className='py-4 px-6 text-white/90'>{transaction?.metaData?.date?.split('T')[0] || 'N/A'}</td>
+                                  <td className='py-4 px-6 text-white/90'>{transaction.clientId?.email || 'N/A'}</td>
+                                  <td className='py-4 px-6 text-white/90'>{transaction.distributor?.email || 'N/A'}</td>
+                                  <td className='py-4 px-6'>
+                                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#4242FA]/20 text-[#4242FA] border border-[#4242FA]/30">
+                                      {transaction.purpose.charAt(0).toUpperCase() + transaction.purpose.slice(1)}
+                                    </span>
+                                  </td>
+                                  <td className='py-4 px-6 font-semibold text-white'>₹{transaction.amount}</td>
+                                  <td className='py-4 px-6'>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                                      transaction.status === 'SUCCESS' ? 'bg-[#4242FA]/20 text-[#4242FA] border-[#4242FA]/30' : 
+                                      transaction.status === 'FAILED' ? 'bg-gray-500/20 text-gray-400 border-gray-500/30' : 
+                                      'bg-white/20 text-white border-white/30'
+                                    }`}>
+                                      {transaction.status}
+                                    </span>
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
 
       </div>
 

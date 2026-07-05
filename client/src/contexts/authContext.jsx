@@ -1,108 +1,107 @@
 import axios from 'axios'
 
-import { createContext, useState,useEffect } from 'react';
-import {useLocation} from 'react-router-dom';
+import { createContext, useState, useEffect } from 'react';
 
 export const authContext = createContext();
 
-const BASE_URL = import.meta.env.VITE_SERVER_BASE_URL
-const CLIENT_URL = import.meta.env.VITE_CLIENT_BASE_URL
+const AUTH_URL = import.meta.env.VITE_AUTH_URL
+const PAYMENT_URL = import.meta.env.VITE_PAYMENT_URL
+const EMAIL_URL = import.meta.env.VITE_EMAIL_URL
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState();
-  const [authLoading,setAuthLoading] = useState(true);
-  const [authMessage,setAuthMessage] = useState('')
-  const [refresh,setRefresh] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authMessage, setAuthMessage] = useState('')
+  const [refresh, setRefresh] = useState(false)
 
-  const logout=()=>{
+  const logout = () => {
     setUser(null);
     localStorage.removeItem('token');
   }
-  
-  const fetchUserWithToken=()=>{
+
+  const fetchUserWithToken = () => {
     const token = localStorage.getItem('token');
-     if (token) {
-        axios
-          .get(`${BASE_URL}/auth/verify`, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          })
-          .then(res => {
-            setUser(res.data[0]);
-          })
-  }}
+    if (token) {
+      axios
+        .get(`${AUTH_URL}/auth/verify`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(res => {
+          setUser(res.data[0]);
+        })
+    }
+  }
 
-
-  const updateUser=(updateFields)=>{
+  const updateUser = (updateFields) => {
     axios
-      .put(`${BASE_URL}/auth/update?id=${user._id}`, {'updateFields':updateFields})
+      .put(`${AUTH_URL}/auth/update?id=${user._id}`, { 'updateFields': updateFields })
       .then(res => {
-          setUser(res.data.user);
+        setUser(res.data.user);
       })
       .catch(err => {});
   }
 
+  const createOrder = async (body, navigate) => {
+    try {
+      const { data } = await axios.post(`${PAYMENT_URL}/payment/create-order`, body);
 
-const getLinkStatus = async (user, setLoading, setPayData, navigate) => {
-  if (!user) {
-    setLoading(false);
-    return;
-  }
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_T4Q0yBv8o6QjlD',
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Jbooking',
+        description: `Booking for ${body.purpose}`,
+        order_id: data.order_id,
+        handler: function (response) {
+          navigate('/paymentRedirecting', { 
+            state: { 
+              payData: { 
+                status: 'PROCESSING', 
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                signature: response.razorpay_signature
+              } 
+            } 
+          });
+        },
+        prefill: {
+          name: user?.username || '',
+          email: user?.email || '',
+        },
+        theme: {
+          color: '#4242FA',
+        },
+        modal: {
+          ondismiss: function () {
+            console.log('Payment cancelled by user');
+          },
+        },
+      };
 
-  const linkId = localStorage.getItem('link_id');
-  if (!linkId) {
-    setLoading(false);
-    navigate('/home');
-    return;
-  }
+      const rzp = new window.Razorpay(options);
 
-  setLoading(true);
+      rzp.on('payment.failed', function (response) {
+        console.error('Payment failed:', response.error);
+        navigate('/paymentRedirecting', { state: { payData: { status: 'FAILED' } } });
+      });
 
-  try {
-    const { data } = await axios.get(`${BASE_URL}/payment/verify?link_id=${linkId}`);
-
-
-    if (data.status === 'PAID') {
-      await axios.post(`${BASE_URL}/email/invoice?email=${user.email}`, data);
-
+      rzp.open();
+    } catch (err) {
+      console.error('Order creation error:', err);
+      alert('Failed to create payment order. Please try again.');
     }
+  };
 
-    if (['PAID', 'FAILED'].includes(data.status)) {
-      localStorage.removeItem('link_id');
-      setPayData(data);
-    } else {
-      setPayData({});
-    }
-  } catch (error) {
-    console.error('Payment verification error:', error);
-    setPayData({ status: 'ERROR', message: 'Failed to verify payment. Please try again.' });
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-   const createLink = (body) => {
-    axios
-      .post(`${BASE_URL}/payment/create-link?totalAmount=${body.amount}`,body)
-      .then(res => {
-        localStorage.setItem('link_id',res.data.link_id);
-        window.location.href = res.data.link_url;
-      })
-  }
-
-useEffect(() => {
-  if (!user) {
+  useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       axios
-        .get(`${BASE_URL}/auth/verify`, {
+        .get(`${AUTH_URL}/auth/verify`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
-          if (!res.data[0].isSuspended) {
+          if (res.data[0] && !res.data[0].isSuspended) {
             setUser(res.data[0]);
           }
         })
@@ -112,17 +111,14 @@ useEffect(() => {
             logout();
           }
         })
-        .finally(() => setAuthLoading(false)); // MUST be called always
+        .finally(() => setAuthLoading(false));
     } else {
-      setAuthLoading(false); // no token, so no user
+      setAuthLoading(false);
     }
-  }
-}, []);
-
-
+  }, []);
 
   return (
-    <authContext.Provider value={{user,setUser,logout,authLoading,updateUser,createLink,getLinkStatus,authMessage,refresh,setRefresh}}>
+    <authContext.Provider value={{ user, setUser, logout, authLoading, updateUser, createOrder, authMessage, setAuthMessage, refresh, setRefresh }}>
       {children}
     </authContext.Provider>
   )

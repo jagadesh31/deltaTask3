@@ -8,13 +8,10 @@ import { TbLogout } from "react-icons/tb";
 import { FaHome } from "react-icons/fa";
 import { GrTransaction } from "react-icons/gr";
 import { MdLocalMovies } from "react-icons/md";
-import { MdDirectionsRailway } from "react-icons/md";
+
 import { MdDashboard } from "react-icons/md";
 import { FaBookmark } from "react-icons/fa6";
-import { RiLockPasswordFill } from "react-icons/ri";
-import { RiContactsFill } from "react-icons/ri";
-import { GiCometSpark } from "react-icons/gi";
-
+  import { RiLockPasswordFill } from "react-icons/ri";
 function Header() {
   const { user, logout, setAuthMessage } = useContext(authContext);
   const { pathname } = useLocation();
@@ -27,29 +24,32 @@ function Header() {
   ];
 
   const links = {
-    client: [
+    CLIENT: [
       { path: '/home', name: 'Home' },
       { path: '/myBookings', name: 'My Bookings' },
       { path: '/recentTransactions', name: 'Transactions' },
-      { path: '/changePassword', name: 'Change Password' },
-      { path: '/contactUs', name: 'Contact Us' }
+      { path: '/changePassword', name: 'Change Password' }
     ],
-    admin: [
-      { path: '/admin/home', name: 'Home' },
-      { path: '/admin/dashboard', name: 'Dashboard' },
-      { path: '/admin/movies', name: 'Movies' },
-      { path: '/admin/concerts', name: 'Concerts' },
-      { path: '/admin/trains', name: 'Trains' },
-      { path: '/admin/transactions', name: 'Transactions' },
-      { path: '/changePassword', name: 'Change Password' },
-      { path: '/contactUs', name: 'Contact Us' }
+    ADMIN: [
+      { path: '/home', name: 'Home' },
+      { path: '/dashboard', name: 'Dashboard' },
+      { path: '/movies', name: 'Movies' },
+      { path: '/transactions', name: 'Transactions' },
+      { path: '/changePassword', name: 'Change Password' }
     ],
-    vendor: [
-      { path: '/vendor/home', name: 'Home' },
-      { path: '/vendor/dashboard', name: 'Dashboard' },
-      { path: '/vendor/transactions', name: 'Transactions' },
-      { path: '/changePassword', name: 'Change Password' },
-      { path: '/contactUs', name: 'Contact Us' }
+    DISTRIBUTOR: [
+      { path: '/home', name: 'Home' },
+      { path: '/dashboard', name: 'Dashboard' },
+      { path: '/settlements', name: 'Settlements' },
+      { path: '/changePassword', name: 'Change Password' }
+    ],
+    EXHIBITOR: [
+      { path: '/home', name: 'Home' },
+      { path: '/dashboard', name: 'Dashboard' },
+      { path: '/theaters', name: 'Theaters' },
+      { path: '/shows/exhibitor/' + user?._id, name: 'Shows' },
+      { path: '/settlements', name: 'Settlements' },
+      { path: '/changePassword', name: 'Change Password' }
     ]
   };
 
@@ -57,12 +57,13 @@ function Header() {
     Home: <FaHome />,
     'My Bookings': <FaBookmark />,
     'Change Password': <RiLockPasswordFill />,
-    'Contact Us': <RiContactsFill />,
     Movies: <MdLocalMovies />,
-    Trains: <MdDirectionsRailway />,
+
     Transactions: <GrTransaction />,
     Dashboard: <MdDashboard />,
-    Concerts: <GiCometSpark />
+    Theaters: <FaHome />,
+    Shows: <MdLocalMovies />,
+    Settlements: <GrTransaction />
   };
 
   useEffect(() => {
@@ -77,34 +78,10 @@ function Header() {
           <FiMenu onClick={() => setMenu(true)} />
         </div>
 
-        {/* <ul className='headerMiddle w-[50%] hidden md:flex text-white font-medium text-md lg:text-xl font-poppins justify-evenly items-center'>
-          {user
-            ? links[user.role].slice(0, 3).map((ele, idx) => (
-                <NavLink key={idx} to={ele.path}>
-                  <li>{ele.name}</li>
-                </NavLink>
-              ))
-            : guestLinks.map((ele, idx) => (
-                <NavLink key={idx} to={ele.path}>
-                  <li>{ele.name}</li>
-                </NavLink>
-              ))}
-        </ul> */}
-
         {user ? (
-          <Link to={user.role === 'client' ? '/profile' : `/${user.role}/profile`} className='flex items-center gap-4'>
-            {(user.role === 'client' || user.role === 'vendor') && (
-              <div className="clientamount">
-                <span className="amount border-1 border-gray-400 hover:border-[#eee] px-3 py-2 text-white rounded-xl">₹{user.amountAvailable}</span>
-              </div>
-            )}
+          <Link to={'/profile'} className='flex items-center gap-4'>
             <div className='profileContainer'>
               <span className='profileImage'>
-                <span className="verificationbox relative size-8 -right-8">
-                  {user.isVerified
-                    ? <span className="greendot size-2 bg-green-600 animate-ping absolute rounded-full"></span>
-                    : <span className="reddot size-2 bg-red-600 animate-ping absolute rounded-full"></span>}
-                </span>
                 <img src={user.profileImageUrl} className='h-10 w-10 text-white rounded-full' />
               </span>
             </div>
@@ -144,7 +121,7 @@ function Header() {
             )}
 
             <ul className="flex flex-col gap-2 mt-4">
-              {user
+              {user && links[user.role]
                 ? links[user.role].map((ele, idx) => (
                     <NavLink
                       key={idx}

@@ -2,9 +2,10 @@ import axios from 'axios';
 import '../../App.css';
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { FiEdit2 } from 'react-icons/fi';
 import { authContext } from '../../contexts/authContext.jsx';
 
-const BASE_URL = import.meta.env.VITE_SERVER_BASE_URL;
+const BASE_URL = import.meta.env.VITE_AUTH_URL;
 
 export const Profile = () => {
   const navigate = useNavigate();
@@ -73,10 +74,10 @@ export const Profile = () => {
           />
           <label
             htmlFor="file"
-            className="absolute bottom-0 right-0 bg-[#4242FA] text-white rounded-full p-1 sm:p-2 cursor-pointer hover:bg-opacity-90 transition"
+            className="absolute bottom-0 right-0 bg-[#4242FA] text-white rounded-full p-2 cursor-pointer hover:bg-opacity-90 transition"
             title="Change profile image"
           >
-            🖉
+            <FiEdit2 size={16} />
           </label>
           <input
             id="file"
@@ -111,16 +112,7 @@ export const Profile = () => {
             />
           </div>
 
-  
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">
-            <label className="text-white font-medium mb-1 sm:mb-0 w-28">Verified</label>
-            <input
-              type="text"
-              value={user.isVerified ? 'Yes' : 'No'}
-              disabled
-              className="flex-1 p-1.5 rounded-lg bg-gray-800 border-2 border-gray-700 text-white cursor-not-allowed"
-            />
-          </div>
+
 
       
           <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4">

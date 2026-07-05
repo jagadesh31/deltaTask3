@@ -1,0 +1,172 @@
+
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: nittbooking-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: jbooking-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    container_name: jbooking-redis
+    command: redis-server --notify-keyspace-events Ex
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  auth-service:
+    build:
+      context: ./server/auth-service
+      dockerfile: Dockerfile
+    container_name: nittbooking-auth
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - MONGODB_URL=mongodb+srv://jagadesh:5H8DNdJgxtRgoeot@cluster1.0qd3hua.mongodb.net/NittBooking?retryWrites=true&w=majority&appName=cluster1
+      - SECRET_KEY=6303481401
+      - GOOGLE_CLIENT_ID=486170631932-5s4abs9lgv958ptc06ho5705r50i2ccb.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
+
+      - CLOUD_NAME=diizmtj04
+      - CLOUD_KEY=439939817641678
+      - CLOUD_SECRET=jQVIQWtKodGl5Q90KUMTQya35Sk
+      - CLIENT_URL=http://localhost:8000
+      - SERVER_URL=http://localhost:8001
+      - JAUTH_BASE_URL=${JAUTH_BASE_URL:-http://host.docker.internal:8006}
+      - JAUTH_CLIENT_ID=a925084f38b053b4e5f98c0a7a6f404b29f2e2a0d5e76f992db0cca9a5453240
+      - JAUTH_CLIENT_SECRET=dabade4c80720da5ac14d9d1c4dd789deed1ceec5ada09d796fbcf2a5f8c92e8
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  app-service:
+    build:
+      context: ./server/app-service
+      dockerfile: Dockerfile
+    container_name: nittbooking-app
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+      - MONGODB_URL=mongodb+srv://jagadesh:5H8DNdJgxtRgoeot@cluster1.0qd3hua.mongodb.net/NittBooking?retryWrites=true&w=majority&appName=cluster1
+      - CLIENT_URL=http://localhost:8000
+      - REDIS_URL=redis://jbooking-redis:6379
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - app-network
+
+  payment-service:
+    build:
+      context: ./server/payment-service
+      dockerfile: Dockerfile
+    container_name: nittbooking-payment
+    ports:
+      - "8003:8003"
+    environment:
+      - PORT=8003
+      - MONGODB_URL=mongodb+srv://jagadesh:5H8DNdJgxtRgoeot@cluster1.0qd3hua.mongodb.net/NittBooking?retryWrites=true&w=majority&appName=cluster1
+      - RAZORPAY_KEY_ID=rzp_test_T4QCw0RGAXxiqq
+      - RAZORPAY_KEY_SECRET=uoYG6euT6c6JFJ6d35nKcWc8
+      - CLIENT_URL=http://localhost:8000
+      - RABBITMQ_URL=amqp://jbooking-rabbitmq
+      - ASYNC_EMAIL=true
+      - EMAIL_SERVICE_URL=http://nittbooking-email:8004
+      - RAZORPAY_WEBHOOK_SECRET=${RAZORPAY_WEBHOOK_SECRET:-}
+    depends_on:
+      - mongodb
+      - rabbitmq
+    networks:
+      - app-network
+
+  email-service:
+    build:
+      context: ./server/email-service
+      dockerfile: Dockerfile
+    container_name: nittbooking-email
+    ports:
+      - "8004:8004"
+    environment:
+      - PORT=8004
+      - MONGODB_URL=mongodb+srv://jagadesh:5H8DNdJgxtRgoeot@cluster1.0qd3hua.mongodb.net/NittBooking?retryWrites=true&w=majority&appName=cluster1
+      - Gmail=gamerdevil033@gmail.com
+      - Gmail_pass=acuq kycu iyhe xiyc
+      - CLIENT_URL=http://localhost:8000
+      - SERVER_URL=http://localhost:8004
+      - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+      - RABBITMQ_URL=amqp://jbooking-rabbitmq
+      - ASYNC_EMAIL=true
+    depends_on:
+      - mongodb
+      - rabbitmq
+    networks:
+      - app-network
+
+  websocket-service:
+    build:
+      context: ./server/websocket-service
+      dockerfile: Dockerfile
+    container_name: nittbooking-websocket
+    ports:
+      - "8005:8005"
+    environment:
+      - PORT=8005
+      - MONGODB_URL=mongodb+srv://jagadesh:5H8DNdJgxtRgoeot@cluster1.0qd3hua.mongodb.net/NittBooking?retryWrites=true&w=majority&appName=cluster1
+      - CLIENT_URL=http://localhost:8000
+      - REDIS_URL=redis://jbooking-redis:6379
+    depends_on:
+      - redis
+    networks:
+      - app-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - VITE_AUTH_URL=http://localhost:8001
+        - VITE_APP_URL=http://localhost:8002
+        - VITE_PAYMENT_URL=http://localhost:8003
+        - VITE_EMAIL_URL=http://localhost:8004
+        - VITE_WEBSOCKET_URL=http://localhost:8005
+        - VITE_WEBSOCKET=true
+        - VITE_CLIENT_BASE_URL=http://localhost:8000
+        - VITE_RAZORPAY_KEY_ID=rzp_test_T4QCw0RGAXxiqq
+        - VITE_JAUTH_BASE_URL=${VITE_JAUTH_BASE_URL:-http://localhost:8006}
+        - VITE_JAUTH_CLIENT_ID=a925084f38b053b4e5f98c0a7a6f404b29f2e2a0d5e76f992db0cca9a5453240
+    container_name: nittbooking-client
+    ports:
+      - "8000:8000"
+    depends_on:
+      - auth-service
+      - app-service
+      - payment-service
+      - email-service
+      - websocket-service
+    networks:
+      - app-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  app-network:
+    driver: bridge

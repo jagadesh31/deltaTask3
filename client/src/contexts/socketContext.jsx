@@ -1,30 +1,44 @@
-// import { io } from 'socket.io-client';
+import { io } from 'socket.io-client';
+import { createContext, useRef, useCallback } from 'react';
 
-// import {useContext,createContext, Children} from 'react';
+const WEBSOCKET_ENABLED = import.meta.env.VITE_WEBSOCKET === 'true';
+const WEBSOCKET_URL = import.meta.env.VITE_WEBSOCKET_URL;
 
-// const URL = 'http://localhost:5000'
+export const SocketContext = createContext();
 
-// export const SocketContext = createContext()
+export const SocketProvider = ({ children }) => {
+  const socketRef = useRef(null);
 
-// export const SocketProvider= ({children})=>{
+  const getSocket = useCallback(() => {
+    if (!WEBSOCKET_ENABLED) return null;
 
-//   const socket = io(URL, {
-//       autoConnect: false
-//     });
+    if (!socketRef.current) {
+      socketRef.current = io(WEBSOCKET_URL, {
+        autoConnect: false,
+      });
+    }
+    return socketRef.current;
+  }, []);
 
-//   const connect =()=> {
-//      socket.connect();
-//   }
+  const connect = useCallback(() => {
+    if (!WEBSOCKET_ENABLED) return;
+    const socket = getSocket();
+    if (socket && !socket.connected) {
+      socket.connect();
+    }
+  }, [getSocket]);
 
-//   const disconnect = ()=>{
-//     socket.disconnect()
-//   }
+  const disconnect = useCallback(() => {
+    if (!WEBSOCKET_ENABLED) return;
+    const socket = getSocket();
+    if (socket && socket.connected) {
+      socket.disconnect();
+    }
+  }, [getSocket]);
 
-
-// return (
-//   <SocketContext.Provider value={{connect,disconnect,socket}}>
-//         {children}
-//   </SocketContext.Provider>
-// )
-
-// }
+  return (
+    <SocketContext.Provider value={{ connect, disconnect, getSocket, isEnabled: WEBSOCKET_ENABLED }}>
+      {children}
+    </SocketContext.Provider>
+  );
+};

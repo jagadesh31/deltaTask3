@@ -4,21 +4,23 @@ import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 
 import { SeatLayout } from '../../components/seatLayout.jsx';
 import { authContext } from '../../contexts/authContext.jsx';
+import { SocketContext } from '../../contexts/socketContext.jsx';
 import Loader from '../../components/loader.jsx';
 import '../../App.css';
 
-let BASE_URL = import.meta.env.VITE_SERVER_BASE_URL;
+let BASE_URL = import.meta.env.VITE_APP_URL;
 
 export function SeatSelection() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { user, createLink } = useContext(authContext);
+  const { user, createOrder } = useContext(authContext);
+  const { connect, disconnect, getSocket, isEnabled } = useContext(SocketContext);
 
   const { entityType, _id, type, showId } = useParams();
 
   const [loading, setLoading] = useState(true);
-  const [creatingLink, setCreatingLink] = useState(false); 
+  const [creatingLink, setCreatingLink] = useState(false);
 
   const [show, setShow] = useState(null);
   const [theater, setTheater] = useState(null);
@@ -30,7 +32,7 @@ export function SeatSelection() {
   const [unavailableSeats, setUnavailableSeats] = useState([]);
 
   const totalPrice = useRef(0);
-
+  const roomName = useRef('');
 
   const colors = {
     available: { color: 'transparent' },
@@ -39,7 +41,6 @@ export function SeatSelection() {
     unavailable: { color: '#636363' },
   };
 
- 
   useEffect(() => {
     setLoading(true);
     axios
@@ -49,9 +50,9 @@ export function SeatSelection() {
           const showData = res.data[0];
           setShow(showData);
           setTheater(showData[type]);
+          roomName.current = showData.date + showData.slot;
           setLoading(false);
         } else {
-
           alert('Show not found');
           navigate('/');
         }
@@ -63,40 +64,118 @@ export function SeatSelection() {
       });
   }, [entityType, showId, type, navigate]);
 
+  // WebSocket: connect + join room + listen for events
+  useEffect(() => {
+    if (!isEnabled || !show) return;
+
+    connect();
+    const socket = getSocket();
+    if (!socket) return;
+
+    const room = roomName.current;
+
+    // Join room once connected
+    const onConnect = () => {
+      socket.emit('joinRoom', room);
+    };
+
+    if (socket.connected) {
+      socket.emit('joinRoom', room);
+    } else {
+      socket.on('connect', onConnect);
+    }
+
+    // Receive current state when joining
+    socket.on('initialState', (seats) => {
+      setUnavailableSeats(prev => {
+        const unique = new Set([...prev, ...seats]);
+        return Array.from(unique);
+      });
+    });
+
+    // Listen for other users selecting seats
+    socket.on('seatSelected', ({ seatId }) => {
+      setUnavailableSeats(prev => {
+        if (!prev.includes(seatId)) return [...prev, seatId];
+        return prev;
+      });
+    });
+
+    // Listen for other users deselecting seats
+    socket.on('seatDeselected', ({ seatId }) => {
+      setUnavailableSeats(prev => prev.filter(s => s !== seatId));
+    });
+
+    return () => {
+      socket.emit('leaveRoom', room);
+      socket.off('initialState');
+      socket.off('seatSelected');
+      socket.off('seatDeselected');
+      socket.off('connect', onConnect);
+      disconnect();
+    };
+  }, [isEnabled, show, connect, disconnect, getSocket]);
 
   const getTotalPrice = () => {
-    if (!show || !theater) return 0;
+    if (!show || !theater || !selectedSeats) return 0;
 
-    let basePrice = show.basePrice;
     let total = 0;
+    let basePrice = show.basePrice || 100;
+    let increment = 20; // Price increases by 20 for each row away from the screen
 
-    selectedSeats.forEach((seat) => {
- 
-      let row = seat.charCodeAt(0) - 65;
-      let col = parseInt(seat.slice(1)) - 1;
+    let tiers = theater?.seatLayout?.tiers || [];
+    if (tiers.length === 0) {
+      const defaultCapacity = Number(theater?.seatLayout?.totalSeats) || Number(theater?.capacity) || 100;
+      tiers = [{
+        name: 'Default',
+        seatCapacity: defaultCapacity,
+        rows: Math.max(1, Math.ceil(defaultCapacity / 10))
+      }];
+    }
+    
+    let totalRows = 0;
+    tiers.forEach(tier => { totalRows += (Number(tier.rows) || 1); });
 
-      let seatValue = theater.layout.seatsLayout.seats[row][col].value;
-      total += basePrice * seatValue;
+    selectedSeats.forEach(seatId => {
+      let foundRow = -1;
+      let currentGlobalRow = 0;
+      
+      tiers.forEach(tier => {
+        const rows = Number(tier.rows) || 1;
+        const totalSeats = Number(tier.seatCapacity) || 0;
+        const cols = Math.ceil(totalSeats / rows);
+        
+        const prefix = `${tier.name}-`;
+        if (seatId.startsWith(prefix)) {
+          const i = parseInt(seatId.substring(prefix.length)) - 1;
+          const localRow = Math.floor(i / cols);
+          foundRow = currentGlobalRow + localRow;
+        }
+        currentGlobalRow += rows;
+      });
+      
+      let price = basePrice;
+      if (foundRow !== -1) {
+        const distanceFromScreen = (totalRows - 1) - foundRow;
+        price = basePrice + (distanceFromScreen * increment);
+      }
+      total += price;
     });
 
     totalPrice.current = total;
     return total;
   };
 
- 
   const handleProceedPayment = () => {
     if (!user) {
-
       navigate('/login', { state: { from: location.pathname } });
       return;
     }
     if (selectedSeats.length !== maxSeatCount) {
-
       return;
     }
 
     setCreatingLink(true);
-
 
     const metaData = {
       showId: show._id,
@@ -105,28 +184,19 @@ export function SeatSelection() {
       slot: show.slot,
       date: show.date,
       seatsBooked: selectedSeats,
+      poster: show[entityType]?.poster,
     };
 
     const body = {
       purpose: entityType,
       user: user._id,
-      vendor: show[entityType].organizedBy,
+      distributor: show[entityType]?.organizedBy || show[entityType]?.addedBy,
+      exhibitor: show[type]?.addedBy,
       amount: totalPrice.current,
       metaData,
     };
 
-
-    createLink(body)
-      .then(() => {
-
-      })
-      .catch((error) => {
-        alert('Failed to create payment link. Try again.');
-        console.error(error);
-      })
-      .finally(() => {
-        setCreatingLink(false);
-      });
+    createOrder(body, navigate);
   };
 
   return (
@@ -165,7 +235,7 @@ export function SeatSelection() {
 
             <div className="seatsGrid py-2 flex justify-center items-center flex-grow overflow-auto">
               <SeatLayout
-                seats={theater.layout.seatsLayout.seats}
+                theater={theater}
                 ticketsBooked={show.ticketsBooked}
                 selectedSeats={selectedSeats}
                 setSelectedSeats={setSelectedSeats}
@@ -173,6 +243,7 @@ export function SeatSelection() {
                 maxSeatCount={maxSeatCount}
                 setMaxSeatCount={setMaxSeatCount}
                 show={show}
+                roomName={roomName.current}
               />
             </div>
 

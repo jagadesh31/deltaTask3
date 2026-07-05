@@ -2,45 +2,42 @@ import './App.css'
 import {
   createBrowserRouter,
   RouterProvider,
-  Navigate,
-  useLocation
 } from 'react-router-dom'
-import { useContext, useEffect, useRef } from 'react'
+
 
 
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 
 import { ProtectedRoute } from './routes/protectedRoute.jsx'
 import { PublicRoute } from './routes/publicRoute.jsx'
 //client
-import {Home} from './pages/client/home.jsx'
+import {Home as ClientHome} from './pages/client/home.jsx'
 import MoviesInfo from './pages/client/entityInfo.jsx'
 import TicketSelection from './pages/client/ticketSelection.jsx'
-import { ContactUs } from './pages/client/contactus.jsx'
+
 import {SeatSelection} from './pages/client/seatSelection.jsx'
-import { TrainBooking } from './pages/client/trainBooking.jsx'
+
 import { RecentTransactions } from './pages/client/recentTransactions.jsx'
 import {MyBookings} from './pages/client/mybookings.jsx'
-// import { TicketSummary } from './pages/client/ticketSummary'
+
 
 //admin
 import { AdminHome} from './pages/admin/home.jsx'
 import { Movies } from './pages/admin/movies.jsx'
-import { Concerts } from './pages/admin/concerts.jsx'
-import { Trains } from './pages/admin/trains.jsx'
+
 import { AdminDashboard } from './pages/admin/dashboard.jsx'
 import { Transactions } from './pages/admin/transactions.jsx'
-import { VendorEvents } from './pages/admin/vendorEvents.jsx'
 
 
+//distributor
+import { DistributorDashboard } from './pages/distributor/dashboard.jsx';
+import { DistributorHome } from './pages/distributor/home.jsx';
 
-//vendor
-import { VendorDashboard } from './pages/vendor/dashboard.jsx';
-import { VendorHome } from './pages/vendor/home.jsx';
-import { VendorTransactions } from './pages/vendor/transactions.jsx';
-
+//exhibitor
+import { ExhibitorDashboard } from './pages/exhibitor/dashboard.jsx';
+import { ExhibitorTheaters } from './pages/exhibitor/theaters.jsx';
 
 
 //shared
@@ -53,10 +50,10 @@ import PageNotFound from './pages/shared/pageNotFound.jsx'
 import {PaymentRedirecting} from './pages/shared/paymentRedirecting.jsx'
 import { ShowsInfo } from './pages/shared/showsInfo.jsx'
 import { Shows } from './pages/shared/shows.jsx';
-import Monitor from './services/monitor.jsx';
-import { monitorStatus } from './services/main.js';
+import { UnifiedHome } from './pages/shared/UnifiedHome.jsx';
+import { UnifiedDashboard } from './pages/shared/UnifiedDashboard.jsx';
+import { Settlements } from './pages/shared/settlements.jsx';
 
-// import { SocketProvider } from './contexts/socketContext.jsx'
 
 
 
@@ -78,124 +75,12 @@ let router = createBrowserRouter([
     element: <ResetPassword />
   },
   {
-    path: '/admin',
-    children: [
-      {
-        element: <ProtectedRoute allowedRoles={['admin']} />,
-        children: [
-          {
-            index:true,
-            element : <Navigate to='/admin/dashboard'/>
-          },
-          {
-            path:'home',
-            element: <AdminHome />
-          },
-          {
-            path: 'dashboard',
-            element: <AdminDashboard />
-          },
-          {
-            path: 'movies',
-            element: <Movies />
-          },
-          {
-            path: 'concerts',
-            element: <Concerts />
-          },
-          {
-            path: 'show/:entityType/:showId',
-            element: <ShowsInfo/>
-          },
-          {
-            path: 'shows/:entityType/:entityId',
-            element: <Shows />
-          },
-          {
-            path: 'trains',
-            element: <Trains />
-          },
-          {
-            path: 'events/:vendorId',
-            element: <VendorEvents />
-          },
-          {
-            path: 'contactus',
-            element: <ContactUs />
-          },
-          {
-            path: 'changePassword',
-            element: <ChangePassword />
-          },
-          {
-            path: 'transactions',
-            element: <Transactions />
-          },
-          {
-            path: 'profile',
-            element: <Profile />
-          }
-        ]
-      }
-    ]
-  },
-  {
-    path: '/vendor',
-    children: [
-      {
-        element: <ProtectedRoute allowedRoles={['vendor']} />,
-        children: [
-          {
-            index:true,
-            element : <Navigate to='/vendor/dashboard'/>
-          },
-          {
-            path: 'home',
-            element: <VendorHome />
-          },
-          {
-            path: 'shows/:entityType/:entityId',
-            element: <Shows />
-          },
-          {
-            path: 'show/:entityType/:showId',
-            element: <ShowsInfo />
-          },
-          {
-            path: 'dashboard',
-            element: <VendorDashboard />
-          },
-          {
-            path: 'contactus',
-            element: <ContactUs />
-          },
-          {
-            path: 'changePassword',
-            element: <ChangePassword />
-          },
-          {
-            path: 'profile',
-            element: <Profile />
-          },
-          {
-            path: 'transactions',
-            element: <VendorTransactions />
-          }
-        ]
-      }
-    ]
-  },
- {
     path: '/',
     element: <PublicRoute/>,
     children: [
       {
         index: true,
-        element: <Home />,
-      },
-      {
-        path: 'home',
-        element: <Home />
+        element: <UnifiedHome />,
       },
       {
         path: ':entityType/:_id',
@@ -205,8 +90,49 @@ let router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <ProtectedRoute allowedRoles={['client']} />,
+    element: <ProtectedRoute allowedRoles={['admin', 'ADMIN', 'client', 'CLIENT', 'distributor', 'DISTRIBUTOR', 'exhibitor', 'EXHIBITOR']} />,
     children: [
+      {
+        path: 'home',
+        element: <UnifiedHome />
+      },
+      {
+        path: 'dashboard',
+        element: <UnifiedDashboard />
+      },
+      {
+        path: 'profile',
+        element: <Profile />
+      },
+      {
+        path: 'changePassword',
+        element: <ChangePassword />
+
+      },
+      {
+        path: 'show/:entityType/:showId',
+        element: <ShowsInfo/>
+      },
+      {
+        path: 'shows/:entityType/:entityId',
+        element: <Shows />
+      },
+      {
+        path: 'transactions',
+        element: <Transactions />
+      },
+      {
+        path: 'settlements',
+        element: <Settlements />
+      },
+      {
+        path: 'movies',
+        element: <Movies />
+      },
+      {
+        path: 'theaters',
+        element: <ExhibitorTheaters />
+      },
       {
         path: ':entityType/:_id/:type',
         element: <TicketSelection />
@@ -214,10 +140,6 @@ let router = createBrowserRouter([
       {
         path: ':entityType/:_id/:type/:showId',
         element: <SeatSelection />
-      },
-      {
-        path: 'train/:trainId',
-        element: <TrainBooking />
       },
       {
         path: 'myBookings',
@@ -230,18 +152,6 @@ let router = createBrowserRouter([
       {
         path: 'paymentRedirecting',
         element: <PaymentRedirecting />
-      },
-      {
-        path: 'profile',
-        element: <Profile />
-      },
-      {
-        path: 'changePassword',
-        element: <ChangePassword />
-      },
-      {
-        path: 'contactus',
-        element: <ContactUs />
       }
     ]
   },
@@ -257,13 +167,11 @@ let router = createBrowserRouter([
 
 function App () {
 
-
   return (
-    // <SocketProvider>
-      <RouterProvider router={router}>
-        <Monitor/>
-      </RouterProvider>
-    // </SocketProvider>
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} theme="dark" />
+    </>
   )
 }
 

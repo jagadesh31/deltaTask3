@@ -16,9 +16,8 @@ export function MoviesContainer (props) {
 
 
   return (
-    <div className='bg-blackMedium w-full'>
-      <br />
-      <div className='title text-white text-[22px] font-medium pb-3 md:pb-4 md:text-[26px] md:font-bold'>
+    <div className='w-full mb-8'>
+      <div className='title text-white text-[22px] font-medium pb-3 md:pb-4 md:text-[26px] md:font-bold tracking-wide uppercase'>
         {props.genre}
       </div>
 
@@ -45,7 +44,6 @@ export function MoviesContainer (props) {
       </div>
 
       <br />
-      {props.genre != 'Thriller' && <hr className='bg-white text-white' />}
     </div>
   )
 }
@@ -58,7 +56,7 @@ export function ShowsCard (props) {
     <div className='cardContainer cursor-pointer'>
       <div className='imageContainer overflow-hidden rounded-xl h-[185px] w-[130px] md:h-[285px] md:w-[200px] border-[#636363] hover:border-white border-2'>
         {/* <button onClick={(e)=>{sendClicks({"userId" :user?._id,"notes" :`clicked ${show.title} movie`});return navigate(`/${show.type}/${show._id}`)}} className='cursor-pointer'> */}
-           <button onClick={(e)=>{navigate(`/${show.type}/${show._id}`)}} className='cursor-pointer'>
+           <button onClick={(e)=>{navigate(`/${(show.type || 'movie').toLowerCase()}/${show._id}`)}} className='cursor-pointer'>
           <img
             src={show.poster}
             draggable='false'
