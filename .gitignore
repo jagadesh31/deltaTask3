@@ -23,3 +23,7 @@ server/npm-debug.log*
 
 # Optional: VS Code settings
 server/.vscode/
+
+
+jauth/
+jauth
